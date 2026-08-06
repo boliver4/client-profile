@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f2742" />
+  <meta name="application-name" content="Client Information" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Client Info" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <title>Client Information</title>
+  <style>
+    :root{
+      --navy:#0f2742;--navy2:#173d63;--blue:#2f6fa5;--bg:#f3f6f9;--card:#fff;
+      --text:#17212b;--muted:#667788;--line:#d7e0e8;--ok:#16794b;--danger:#b3261e;
+      --shadow:0 12px 34px rgba(15,39,66,.09);--radius:16px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    button,input,select,textarea{font:inherit}
+    .app{min-height:100vh;padding-bottom:96px}
+    .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;box-shadow:0 3px 16px rgba(0,0,0,.14)}
+    .top-inner{max-width:1100px;margin:auto;padding:18px 22px 14px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+    .brand h1{font-size:1.15rem;margin:0}.brand p{margin:3px 0 0;font-size:.82rem;color:#d6e5f2}
+    .save-state{font-size:.82rem;display:flex;gap:7px;align-items:center;white-space:nowrap}.dot{width:9px;height:9px;border-radius:50%;background:#8bd3ad}.dot.busy{background:#ffd166}.dot.error{background:#ff8a80}
+    .progress-wrap{max-width:1100px;margin:auto;padding:0 22px 14px}.progress{height:7px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}.progress>div{height:100%;background:#fff;border-radius:inherit;transition:width .25s ease}
+    main{max-width:1100px;margin:24px auto;padding:0 22px}
+    .step{display:none}.step.active{display:block;animation:fade .18s ease}@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .step-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}.step-head h2{margin:0 0 6px;font-size:1.55rem;color:var(--navy)}.step-head p{margin:0;color:var(--muted)}.step-num{background:#e7f0f8;color:var(--navy);padding:7px 10px;border-radius:999px;font-weight:700;font-size:.8rem;white-space:nowrap}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+    .card h3{margin:0 0 14px;color:var(--navy);font-size:1.05rem}.section-card{overflow:hidden;padding-top:0}.section-card-header{margin:0 -20px 18px;padding:15px 20px;border-bottom:1px solid var(--line);background:#edf4fa}.section-card-header h3{margin:0 0 4px;font-size:1.12rem}.section-card-header p{margin:0;color:var(--muted);font-size:.86rem}.financial-card{margin-top:26px;border-top:4px solid var(--blue)}.employment-card{border-top:4px solid var(--navy)}.card-sub{margin:-7px 0 16px;color:var(--muted);font-size:.88rem}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.col-12{grid-column:span 12}.col-8{grid-column:span 8}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}
+    label{display:block;font-size:.82rem;font-weight:700;color:#314252;margin-bottom:6px}.req::after{content:" *";color:var(--danger)}
+    input,select,textarea{width:100%;border:1px solid #bac8d4;background:#fff;border-radius:10px;padding:11px 12px;color:var(--text);outline:none;transition:.15s}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,111,165,.13)}textarea{min-height:90px;resize:vertical}
+    .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.check{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fbfcfd}.check input{width:auto;margin:0}.check label{margin:0;font-weight:600;font-size:.88rem}
+    .inline-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px}.switch{position:relative;width:48px;height:27px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#aebbc7;border-radius:99px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.25)}.switch input:checked+.slider{background:var(--ok)}.switch input:checked+.slider:before{transform:translateX(21px)}
+    .repeat-item{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:12px;background:#fbfcfd;position:relative}.repeat-title{font-weight:800;color:var(--navy);margin:0 0 12px}.remove{position:absolute;right:12px;top:10px;border:0;background:#fbe9e7;color:var(--danger);border-radius:9px;padding:7px 9px;cursor:pointer;font-weight:700}.add-btn{border:1px dashed var(--blue);color:var(--blue);background:#f4f9fd;border-radius:11px;padding:10px 13px;font-weight:800;cursor:pointer}
+    .notice{border-left:4px solid var(--blue);background:#edf5fb;border-radius:10px;padding:12px 14px;color:#29485f;font-size:.88rem}.warning{border-left-color:#b66a00;background:#fff5e6;color:#6a4309}
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);border-top:1px solid var(--line);backdrop-filter:blur(10px)}.nav-inner{max-width:1100px;margin:auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer}.btn-primary{background:var(--navy);color:#fff}.btn-secondary{background:#e8eef4;color:var(--navy)}.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--navy)}.btn-danger{background:#fbe9e7;color:var(--danger)}.nav-label{font-size:.82rem;color:var(--muted);text-align:center}
+    .review-section{margin-bottom:18px}.review-section h3{margin:0 0 10px;color:var(--navy);border-bottom:2px solid #dce7f0;padding-bottom:7px}.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}.review-row{display:flex;gap:8px;border-bottom:1px solid #edf1f4;padding:6px 0;font-size:.9rem}.review-row b{min-width:150px;color:#435466}.review-list{margin:5px 0 0;padding-left:20px}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.action-card{border:1px solid var(--line);border-radius:14px;padding:16px}.action-card h4{margin:0 0 7px;color:var(--navy)}.action-card p{margin:0 0 12px;color:var(--muted);font-size:.87rem}
+    .draft-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;margin-bottom:18px}.draft-banner strong{color:var(--navy)}.draft-banner p{margin:3px 0 0;color:var(--muted);font-size:.86rem}.draft-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .hidden{display:none!important}.conditional-block{grid-column:span 12}.helper{font-size:.76rem;color:var(--muted);margin-top:5px}.validation{color:var(--danger);font-size:.82rem;margin-top:8px;display:none}
+    /* Responsive layout: desktop, iPad/tablet, and iPhone */
+    img,svg,canvas{max-width:100%}
+    input,select,textarea,.btn{min-height:44px}
+    .grid>*{min-width:0}
+    input[type="date"]{min-width:0;max-width:100%;width:100%;-webkit-appearance:none;appearance:none}
+    .identity-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;min-width:0}
+    .identity-row>.identity-field{min-width:0;overflow:hidden}
+    .identity-row input,.identity-row select{display:block;min-width:0;max-width:100%;width:100%}
+    .identity-row input[type="date"]{inline-size:100%;min-inline-size:0;max-inline-size:100%;overflow:hidden}
+
+    .contact-row{display:grid;grid-template-columns:118px minmax(220px,1fr) 118px minmax(220px,1fr);gap:14px;align-items:end}
+    .contact-type select{padding-left:9px;padding-right:28px;font-size:.9rem}
+    @media(min-width:761px) and (max-width:980px){
+      .top-inner,.progress-wrap,main,.nav-inner{padding-left:18px;padding-right:18px}
+      .contact-row{grid-template-columns:110px minmax(180px,1fr);gap:13px}
+      .identity-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.identity-row .marital-field{grid-column:1 / -1}
+      .card{padding:18px}.grid{gap:13px}
+      .action-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){.identity-row{grid-template-columns:1fr;gap:12px}.identity-row .marital-field{grid-column:auto}.section-card-header{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}.financial-card{margin-top:22px}.draft-banner{align-items:flex-start;flex-direction:column}.draft-actions{width:100%}.draft-actions .btn{flex:1}.top-inner,.progress-wrap,main,.nav-inner{padding-left:14px;padding-right:14px}.brand p{display:none}.grid{gap:12px}.col-8,.col-6,.col-4,.col-3,.col-2,.contact-type,.contact-input{grid-column:span 12}.check-grid,.action-grid,.review-grid{grid-template-columns:1fr}.step-head h2{font-size:1.3rem}.card{padding:16px}.nav-label{display:none}.btn{padding:11px 13px}.review-row{display:block}.review-row b{display:block;margin-bottom:2px}}
+    @media(max-width:420px){
+      .top-inner{padding-top:13px;padding-bottom:11px}.brand h1{font-size:1rem}
+      main{margin-top:16px}.card{padding:14px;border-radius:13px}.section-card-header{margin-left:-14px;margin-right:-14px;padding:13px 14px}
+      .step-head{gap:10px}.step-num{font-size:.72rem;padding:6px 8px}
+      .nav-inner{padding-top:9px;padding-bottom:9px}.btn{padding:10px 11px;font-size:.9rem}
+      input,select,textarea{font-size:16px}.contact-row{grid-template-columns:96px minmax(0,1fr);gap:10px}.contact-type select{padding-left:7px;padding-right:24px}
+    }
+    @media print{
+      @page{size:letter;margin:.32in}
+      body{background:#fff;font-size:9px}.topbar,.bottom-nav,.no-print,.step-head{display:none!important}.app{padding:0}main{max-width:none;margin:0;padding:0}.step{display:none!important}#step-review{display:block!important}.card{box-shadow:none;border:0;padding:0}.action-grid,.notice{display:none!important}
+      .print-client-page{height:9.95in;box-sizing:border-box;page-break-after:always;break-after:page;overflow:hidden;padding:0}
+      .print-client-page:last-child{page-break-after:auto;break-after:auto}
+      .print-page-title{background:#173a5e;color:#fff;padding:10px 12px;margin:0 0 8px;font-size:16px;display:flex;justify-content:space-between;align-items:flex-end}
+      .print-page-title small{font-size:8px;font-weight:400}
+      .print-columns{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+      .review-section{break-inside:avoid;border:1px solid #d9dee6;border-radius:5px;margin:0 0 7px;padding:7px}
+      .review-section h3{margin:-7px -7px 5px;padding:5px 7px;background:#eaf0f7;color:#173a5e;font-size:10px}
+      .review-grid{display:block}.review-row{display:grid;grid-template-columns:42% 58%;gap:5px;padding:3px 0;border-bottom:1px solid #e5e8ed;line-height:1.15}.review-row b{font-size:7.5px;text-transform:uppercase}.review-row span{font-size:8.5px;overflow-wrap:anywhere}.review-list{margin:3px 0 0;padding-left:16px;font-size:8.5px;line-height:1.2}.print-footer{font-size:7px;color:#555;border-top:1px solid #bbb;margin-top:4px;padding-top:3px}
+    }
+
+    .splash-screen{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:linear-gradient(145deg,#0f2742,#173d63);color:#fff;transition:opacity .25s ease,visibility .25s ease}.splash-screen.hidden{opacity:0;visibility:hidden}.splash-content{text-align:center;padding:28px}.splash-icon{width:92px;height:92px;border-radius:22px;background:#fff;display:grid;place-items:center;margin:0 auto 18px;box-shadow:0 18px 50px rgba(0,0,0,.22)}.splash-icon svg{width:62px;height:62px}.splash-content h1{font-size:1.45rem;margin:0 0 7px}.splash-content p{margin:0;color:#d6e5f2;font-size:.9rem}.install-btn{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;border-radius:9px;padding:7px 10px;font-size:.78rem;font-weight:800;cursor:pointer;min-height:auto}.top-actions{display:flex;align-items:center;gap:12px}.ios-install-note{position:fixed;left:14px;right:14px;bottom:88px;z-index:45;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 42px 13px 14px;box-shadow:var(--shadow);font-size:.84rem;color:#314252}.ios-install-note button{position:absolute;right:8px;top:7px;border:0;background:transparent;font-size:1.2rem;cursor:pointer;color:#667788}
+    @media(max-width:600px){.top-actions{gap:7px}.install-btn{padding:6px 8px}.save-state{font-size:.74rem}.splash-icon{width:82px;height:82px}}
+    @media print{.splash-screen,.install-btn,.ios-install-note{display:none!important}}
+  </style>
+</head>
+<body>
+<div id="splashScreen" class="splash-screen" aria-hidden="true"><div class="splash-content"><div class="splash-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="13" y="9" width="38" height="48" rx="7" fill="#e7f0f8"/><rect x="21" y="5" width="22" height="10" rx="4" fill="#2f6fa5"/><path d="M22 27h20M22 36h20M22 45h13" stroke="#0f2742" stroke-width="4" stroke-linecap="round"/><path d="m40 45 4 4 8-10" fill="none" stroke="#16794b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>Client Information</h1><p>Secure client intake form</p></div></div>
+<div id="iosInstallNote" class="ios-install-note hidden no-print">To add this app to your iPhone or iPad Home Screen, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.<button type="button" id="closeIosInstall" aria-label="Close">×</button></div>
+<div class="app">
+  <header class="topbar">
+    <div class="top-inner">
+      <div class="brand"><h1>Client Information Sheet</h1><p>Private, local-only intake form</p></div>
+      <div class="top-actions"><button type="button" id="installAppBtn" class="install-btn hidden no-print">Install App</button><div class="save-state"><span id="saveDot" class="dot"></span><span id="saveText">Saved locally</span></div></div>
+    </div>
+    <div class="progress-wrap"><div class="progress"><div id="progressBar" style="width:11.11%"></div></div></div>
+  </header>
+
+  <main>
+    <div id="savedDraftBanner" class="draft-banner hidden no-print">
+      <div><strong>Saved client information is available</strong><p id="savedDraftDetails">Open the saved sheet or continue with this blank profile.</p></div>
+      <div class="draft-actions"><button type="button" class="btn btn-secondary" id="resumeSavedBtn">Return to Saved Sheet</button><button type="button" class="btn btn-ghost" id="dismissSavedBtn">Continue Blank</button></div>
+    </div>
+    <form id="clientForm" novalidate>
+      <section class="step active" data-step="0">
+        <div class="step-head"><div><h2>Primary client</h2><p>Basic identity, contact, and address information.</p></div><span class="step-num">Step 1 of 9</span></div>
+        <div class="card">
+          <h3>Personal information</h3>
+          <div class="grid">
+            <div class="col-4"><label class="req">First name</label><input name="primary.firstName" required autocomplete="given-name"></div>
+            <div class="col-4"><label class="req">Middle name</label><input name="primary.middleName" required autocomplete="additional-name"></div>
+            <div class="col-4"><label class="req">Last name</label><input name="primary.lastName" required autocomplete="family-name"></div>
+            <div class="col-4"><label class="req">Goes by another name?</label><select name="primary.preferred.use" required data-preferred-toggle="primary"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>
+            <div class="col-8 hidden" id="primaryPreferredNameField"><label class="req">Name client goes by</label><input name="primary.preferred.name" autocomplete="nickname"></div>
+            <div class="col-12 identity-row">
+              <div class="identity-field dob-field"><label class="req">Date of birth</label><input type="date" name="primary.dob" required></div>
+              <div class="identity-field ssn-field"><label class="req">SSN or EIN</label><input name="primary.ssn" required inputmode="numeric" autocomplete="off" placeholder="XXX-XX-XXXX" maxlength="11"></div>
+              <div class="identity-field marital-field"><label class="req">Marital status</label><select name="primary.maritalStatus" required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
+            </div>
+            <div class="col-12 contact-row">
+              <div class="contact-type"><label class="req">Email type</label><select name="primary.emailType" required><option selected>Personal</option><option>Work</option></select></div>
+              <div class="contact-input"><label class="req">Email address</label><input type="email" name="primary.email" required autocomplete="email"></div>
+              <div class="contact-type"><label class="req">Phone type</label><select name="primary.phoneType" required><option selected>Cell</option><option>Home</option><option>Work</option></select></div>
+              <div class="contact-input"><label class="req">Phone number</label><input type="tel" name="primary.phone" required autocomplete="tel" inputmode="tel" placeholder="(325) 555-1234" data-phone></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Physical address</h3><p class="card-sub">A physical street address is required; do not use a P.O. Box.</p>
+          <div class="grid">
+            <div class="col-12"><label class="req">Street</label><input name="primary.physical.street" required autocomplete="off" data-address-autocomplete="primary.physical" list="primaryAddressSuggestions"><datalist id="primaryAddressSuggestions"></datalist><div class="helper">Begin typing a U.S. street address. Texas results are prioritized, with nationwide results also included.</div></div>
+            <div class="col-6"><label class="req">City</label><input name="primary.physical.city" required autocomplete="address-level2"></div>
+            <div class="col-3"><label class="req">State</label><input name="primary.physical.state" required maxlength="2" autocomplete="address-level1"></div>
+            <div class="col-3"><label class="req">ZIP</label><input name="primary.physical.zip" required inputmode="numeric" autocomplete="postal-code"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="inline-toggle"><div><h3 style="margin-bottom:3px">Mailing address</h3><p class="card-sub" style="margin:0">Turn on only when different from the physical address.</p></div><label class="switch"><input type="checkbox" id="mailingToggle"><span class="slider"></span></label></div>
+          <div id="mailingFields" class="grid hidden" style="margin-top:14px">
+            <div class="col-12"><label>Street</label><input name="primary.mailing.street"></div><div class="col-6"><label>City</label><input name="primary.mailing.city"></div><div class="col-3"><label>State</label><input name="primary.mailing.state" maxlength="2"></div><div class="col-3"><label>ZIP</label><input name="primary.mailing.zip"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step" data-step="1">
+        <div class="step-head"><div><h2>Employment & Financial Information</h2><p>Complete the employment section first, followed by the client’s financial information.</p></div><span class="step-num">Step 2 of 9</span></div>
+        <div class="card section-card employment-card"><div class="section-card-header"><h3>Employment Information</h3><p>Tell us about the client’s current or most recent employment.</p></div><div class="grid">
+          <div class="col-4"><label class="req">Employment status</label><select name="primary.employment.status" required data-employment-status="primary"><option value="">Select</option><option>Employed</option><option>Business Owner</option><option>Retired</option><option>Student</option><option>Homemaker</option><option>Not Employed</option></select></div>
+          <div id="primaryEmploymentDetails" class="conditional-block hidden"><div class="grid">
+            <div class="col-4" data-role="employer-name"><label class="req" data-label>Employer name</label><input name="primary.employment.employer" autocomplete="off" data-employer-autocomplete="primary.employment" list="primaryEmployerSuggestions"><datalist id="primaryEmployerSuggestions"></datalist><div class="helper">Business suggestions are prioritized near the client’s home address. Select one to fill its listed address, or keep typing your own entry.</div></div>
+            <div class="col-4" data-role="job-title"><label class="req">Job title</label><input name="primary.employment.jobTitle"></div>
+            <div class="col-4" data-role="industry"><label class="req">Industry</label><input name="primary.employment.industry" placeholder="e.g., Education, Healthcare"></div>
+            <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="date" name="primary.employment.statusDate"></div>
+            <div class="col-12"><label class="req" data-address-label>Employer street</label><input name="primary.employment.street" autocomplete="off" data-address-autocomplete="primary.employment" list="primaryEmployerAddressSuggestions"><datalist id="primaryEmployerAddressSuggestions"></datalist></div>
+            <div class="col-6"><label class="req">Employer city</label><input name="primary.employment.city"></div><div class="col-3"><label class="req">Employer state</label><input name="primary.employment.state" maxlength="2"></div><div class="col-3"><label class="req">Employer ZIP</label><input name="primary.employment.zip"></div>
+          </div></div>
+        </div>
+        <div class="card section-card financial-card"><div class="section-card-header"><h3>Financial Information</h3><p>Provide the applicable income, net-worth, and source-of-wealth information.</p></div><div class="grid">
+          <div class="col-4"><label class="req">Income range</label><select name="primary.financial.incomeRange" required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option></select></div>
+          <div class="col-4"><label class="req">Net worth</label><select name="primary.financial.netWorth" required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option><option>$1MM - $5MM</option><option>$5MM - $10MM</option><option>$10MM - $25MM</option><option>$25MM +</option></select></div>
+          <div class="col-4"><label class="req">Liquid net worth (cash)</label><select name="primary.financial.liquidNetWorth" required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option></select></div>
+          <div class="col-12"><label class="req">Source of wealth (select all that apply)</label><div class="check-grid" data-check-group="primary.financial.sourceOfWealth">
+            <div class="check"><input type="checkbox" value="Employment Income"><label>Employment Income</label></div><div class="check"><input type="checkbox" value="Business Ownership"><label>Business Ownership</label></div><div class="check"><input type="checkbox" value="Retirement Benefits"><label>Retirement Benefits</label></div><div class="check"><input type="checkbox" value="Legal Settlement"><label>Legal Settlement</label></div><div class="check"><input type="checkbox" value="Insurance Benefits"><label>Insurance Benefits</label></div><div class="check"><input type="checkbox" value="Gift / Inheritance"><label>Gift / Inheritance</label></div><div class="check"><input type="checkbox" value="Other"><label>Other</label></div>
+          </div></div><div class="col-12"><label>Other source details</label><input name="primary.financial.otherSource"></div>
+        </div></div>
+      </section>
+
+      <section class="step" data-step="2">
+        <div class="step-head"><div><h2>Secondary client</h2><p>Add a spouse, partner, or other co-owner when applicable.</p></div><span class="step-num">Step 3 of 9</span></div>
+        <div class="card"><div class="inline-toggle"><div><h3 style="margin-bottom:3px">Add a secondary client?</h3><p class="card-sub" style="margin:0">You can turn this off later without losing the saved draft.</p></div><label class="switch"><input type="checkbox" id="secondaryToggle"><span class="slider"></span></label></div></div>
+        <div id="secondaryFields" class="hidden">
+          <div class="card"><h3>Secondary client personal information</h3><div class="grid">
+            <div class="col-4"><label class="req">First name</label><input name="secondary.firstName" data-secondary-required></div><div class="col-4"><label class="req">Middle name</label><input name="secondary.middleName" data-secondary-required></div><div class="col-4"><label class="req">Last name</label><input name="secondary.lastName" data-secondary-required></div><div class="col-4"><label class="req">Goes by another name?</label><select name="secondary.preferred.use" data-secondary-required data-preferred-toggle="secondary"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div><div class="col-8 hidden" id="secondaryPreferredNameField"><label class="req">Name client goes by</label><input name="secondary.preferred.name"></div>
+            <div class="col-12 identity-row"><div class="identity-field dob-field"><label class="req">Date of birth</label><input type="date" name="secondary.dob" data-secondary-required></div><div class="identity-field ssn-field"><label class="req">SSN or EIN</label><input name="secondary.ssn" data-secondary-required autocomplete="off" inputmode="numeric" placeholder="XXX-XX-XXXX" maxlength="11"></div><div class="identity-field marital-field"><label class="req">Marital status</label><select name="secondary.maritalStatus" data-secondary-required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div></div>
+            <div class="col-12 contact-row"><div class="contact-type"><label class="req">Email type</label><select name="secondary.emailType" data-secondary-required><option selected>Personal</option><option>Work</option></select></div><div class="contact-input"><label class="req">Email address</label><input type="email" name="secondary.email" data-secondary-required autocomplete="email"></div><div class="contact-type"><label class="req">Phone type</label><select name="secondary.phoneType" data-secondary-required><option selected>Cell</option><option>Home</option><option>Work</option></select></div><div class="contact-input"><label class="req">Phone number</label><input type="tel" name="secondary.phone" data-secondary-required autocomplete="tel" inputmode="tel" placeholder="(325) 555-1234" data-phone></div></div>
+          </div></div>
+          <div class="card"><h3>Physical address</h3><p class="card-sub">If the primary client is married, the home address and marital status are copied automatically and can still be edited.</p><div class="grid">
+            <div class="col-12"><label class="req">Physical street</label><input name="secondary.physical.street" data-secondary-required autocomplete="off" data-address-autocomplete="secondary.physical" list="secondaryAddressSuggestions"><datalist id="secondaryAddressSuggestions"></datalist><div class="helper">Begin typing a U.S. street address. Texas results are prioritized, with nationwide results also included.</div></div><div class="col-6"><label class="req">City</label><input name="secondary.physical.city" data-secondary-required></div><div class="col-3"><label class="req">State</label><input name="secondary.physical.state" maxlength="2" data-secondary-required></div><div class="col-3"><label class="req">ZIP</label><input name="secondary.physical.zip" data-secondary-required></div>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="step secondary-only-step" data-step="3">
+        <div class="step-head"><div><h2>Secondary Employment & Financial Information</h2><p>Complete the same employment and financial sections used for the primary client.</p></div><span class="step-num">Step 4 of 9</span></div>
+        <div id="secondaryFinancialFields">
+          <div class="card section-card employment-card"><div class="section-card-header"><h3>Employment Information</h3><p>Tell us about the secondary client’s current or most recent employment.</p></div><div class="grid">
+            <div class="col-4"><label class="req">Employment status</label><select name="secondary.employment.status" data-secondary-required data-employment-status="secondary"><option value="">Select</option><option>Employed</option><option>Business Owner</option><option>Retired</option><option>Student</option><option>Homemaker</option><option>Not Employed</option></select></div>
+            <div id="secondaryEmploymentDetails" class="conditional-block hidden"><div class="grid">
+              <div class="col-4" data-role="employer-name"><label class="req" data-label>Employer name</label><input name="secondary.employment.employer" autocomplete="off" data-employer-autocomplete="secondary.employment" list="secondaryEmployerSuggestions"><datalist id="secondaryEmployerSuggestions"></datalist><div class="helper">Business suggestions are prioritized near the client’s home address. Select one to fill its listed address, or keep typing your own entry.</div></div>
+              <div class="col-4" data-role="job-title"><label class="req">Job title</label><input name="secondary.employment.jobTitle"></div>
+              <div class="col-4" data-role="industry"><label class="req">Industry</label><input name="secondary.employment.industry"></div>
+              <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="date" name="secondary.employment.statusDate"></div>
+              <div class="col-12"><label class="req" data-address-label>Employer street</label><input name="secondary.employment.street" autocomplete="off" data-address-autocomplete="secondary.employment" list="secondaryEmployerAddressSuggestions"><datalist id="secondaryEmployerAddressSuggestions"></datalist></div>
+              <div class="col-6"><label class="req">Employer city</label><input name="secondary.employment.city"></div><div class="col-3"><label class="req">Employer state</label><input name="secondary.employment.state" maxlength="2"></div><div class="col-3"><label class="req">Employer ZIP</label><input name="secondary.employment.zip"></div>
+            </div></div>
+          </div></div>
+          <div class="card section-card financial-card"><div class="section-card-header"><h3>Financial Information</h3><p>Provide the secondary client’s income, net-worth, and source-of-wealth information.</p></div><div class="grid">
+            <div class="col-4"><label class="req">Income range</label><select name="secondary.financial.incomeRange" data-secondary-required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option></select></div>
+            <div class="col-4"><label class="req">Net worth</label><select name="secondary.financial.netWorth" data-secondary-required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option><option>$1MM - $5MM</option><option>$5MM - $10MM</option><option>$10MM - $25MM</option><option>$25MM +</option></select></div>
+            <div class="col-4"><label class="req">Liquid net worth (cash)</label><select name="secondary.financial.liquidNetWorth" data-secondary-required><option value="">Select</option><option>$0 - $50,000</option><option>$50,000 - $100,000</option><option>$100,000 - $200,000</option><option>$200,000 - $500,000</option><option>$500,000 - $1MM</option></select></div>
+            <div class="col-12"><label>Source of wealth</label><div class="check-grid" data-check-group="secondary.financial.sourceOfWealth"><div class="check"><input type="checkbox" value="Employment Income"><label>Employment Income</label></div><div class="check"><input type="checkbox" value="Business Ownership"><label>Business Ownership</label></div><div class="check"><input type="checkbox" value="Retirement Benefits"><label>Retirement Benefits</label></div><div class="check"><input type="checkbox" value="Legal Settlement"><label>Legal Settlement</label></div><div class="check"><input type="checkbox" value="Insurance Benefits"><label>Insurance Benefits</label></div><div class="check"><input type="checkbox" value="Gift / Inheritance"><label>Gift / Inheritance</label></div><div class="check"><input type="checkbox" value="Other"><label>Other</label></div></div></div>
+          </div></div>
+
+        </div>
+      </section>
+
+      <section class="step" data-step="4">
+        <div class="step-head"><div><h2>Account goals</h2><p>Purpose, time horizon, risk tolerance, and trusted contact.</p></div><span class="step-num">Step 5 of 9</span></div>
+        <div class="card"><h3>Account profile</h3><div class="grid">
+          <div class="col-4"><label class="req">Account purpose</label><select name="account.purpose" required><option value="">Select</option><option>Wealth Preservation</option><option>Provide Income</option><option>Wealth Accumulation</option><option>Accumulation / Income</option></select></div>
+          <div class="col-4"><label class="req">Time horizon</label><select name="account.timeHorizon" required><option value="">Select</option><option>Less than 5 years</option><option>5 - 10 years</option><option>10 - 20 years</option><option>20 + years</option></select></div>
+          <div class="col-4"><label class="req">Risk tolerance</label><select name="account.riskTolerance" required><option value="">Select</option><option>Conservative</option><option>Moderately Conservative</option><option>Moderate</option><option>Moderately Aggressive</option><option>Aggressive</option></select></div>
+        </div></div>
+        <div class="card"><h3>Trusted contact</h3><p class="card-sub">Provide a trusted contact and choose at least one contact method.</p><div class="grid">
+          <div class="col-6"><label class="req">First name</label><input name="trusted.firstName" required></div><div class="col-6"><label class="req">Last name</label><input name="trusted.lastName" required></div>
+          <div class="col-12"><label class="req">How may we contact them?</label><div class="check-grid" data-trusted-methods><div class="check"><input type="checkbox" name="trusted.usePhone" value="Phone"><label>Phone</label></div><div class="check"><input type="checkbox" name="trusted.useEmail" value="Email"><label>Email</label></div></div></div>
+          <div class="col-6 hidden" id="trustedPhoneWrap"><label class="req">Phone number</label><input type="tel" name="trusted.phone" inputmode="tel" placeholder="(325) 555-1234" data-phone></div>
+          <div class="col-6 hidden" id="trustedEmailWrap"><label class="req">Email address</label><input type="email" name="trusted.email"></div>
+        </div></div>
+      </section>
+
+      <section class="step" data-step="5">
+        <div class="step-head"><div><h2>Beneficiaries</h2><p>Beneficiary information is optional. Add primary or contingent beneficiaries when applicable.</p></div><span class="step-num">Step 6 of 9</span></div>
+        <div class="card"><h3>Primary account holder beneficiaries</h3><p class="card-sub">These beneficiaries apply only to the primary client’s account. If beneficiaries are entered, each primary or contingent group must total 100%.</p><div id="primaryBeneficiaries"></div><div id="primaryBeneficiaryTotals" class="notice" style="margin:12px 0">Primary total: 100% &nbsp;|&nbsp; Contingent total: 0%</div><button type="button" class="add-btn" data-add="beneficiary" data-owner="primary">+ Add beneficiary</button></div><div id="secondaryBeneficiaryCard" class="card hidden"><h3>Secondary account holder beneficiaries</h3><p class="card-sub">These beneficiaries apply only to the secondary client’s account.</p><div id="secondaryBeneficiaries"></div><div id="secondaryBeneficiaryTotals" class="notice" style="margin:12px 0">Primary total: 100% &nbsp;|&nbsp; Contingent total: 0%</div><button type="button" class="add-btn" data-add="beneficiary" data-owner="secondary">+ Add beneficiary</button></div>
+      </section>
+
+      <section class="step" data-step="6">
+        <div class="step-head"><div><h2>Children or grandchildren</h2><p>Information used for 529 college savings accounts or UTMAs.</p></div><span class="step-num">Step 7 of 9</span></div>
+        <div class="card"><h3>Child / grandchild information</h3><div id="children"></div><button type="button" class="add-btn" data-add="child">+ Add child or grandchild</button></div>
+      </section>
+
+      <section class="step" data-step="7">
+        <div class="step-head"><div><h2>Bank information</h2><p>Used for sending or receiving funds from the account.</p></div><span class="step-num">Step 8 of 9</span></div>
+        <div class="notice warning no-print">This section contains highly sensitive information. The draft remains only in this browser unless the user exports or emails it. Avoid using a shared or public device.</div>
+        <div class="card" style="margin-top:18px"><h3>Banking details</h3><div class="grid"><div class="col-6"><label>Bank name</label><input name="bank.name" autocomplete="off"></div><div class="col-6"><label>Routing number</label><input name="bank.routing" inputmode="numeric" autocomplete="off"></div><div class="col-6"><label>Account number</label><input name="bank.account" autocomplete="off"></div><div class="col-3"><label>Day of month</label><select name="bank.day" id="bankDay"><option value="">Select</option></select></div><div class="col-3"><label>Starting date</label><input type="date" name="bank.startDate"></div><div class="col-6"><label>Dollar amount</label><input type="text" inputmode="decimal" name="bank.amount" placeholder="$0.00" data-currency></div></div></div>
+      </section>
+
+      <section class="step" id="step-review" data-step="8">
+        <div class="step-head"><div><h2>Review & finish</h2><p>Confirm the information, then print, save as PDF, or prepare an email.</p></div><span class="step-num">Step 9 of 9</span></div>
+        <div class="card"><div id="reviewContent"></div></div>
+        <div class="card no-print"><h3>Save or send</h3><div class="action-grid">
+          <div class="action-card"><h4>Print or save as PDF</h4><p>Opens the browser print dialog. Choose “Save as PDF” to create an email-ready copy.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
+          <div class="action-card"><h4>Email completed form</h4><p>Creates the completed form in the same clean section format used for printing. On iPhone, iPad, and supported devices, the PDF is attached through the Share menu. On desktop, the app creates an Outlook-compatible attached email file.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="" selected>Select an advisor</option><option value="braxton.oliver@raymondjames.com">Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Create Email with PDF Attached</button><button type="button" class="btn btn-secondary" id="shareBtn" style="margin-top:8px">Share Attached PDF</button><p class="small" style="margin-top:8px">Desktop: open the downloaded .eml file to launch the addressed email with the PDF attached. iPhone/iPad: choose Mail or Outlook from the Share menu.</p></div>
+          <div class="action-card"><h4>Download local backup</h4><p>Creates a JSON backup that can be restored in this app later.</p><button type="button" class="btn btn-secondary" id="exportBtn">Download Backup</button></div>
+          <div class="action-card"><h4>Restore backup</h4><p>Load a previously downloaded JSON backup.</p><input type="file" id="importFile" accept="application/json" style="margin-bottom:10px"><button type="button" class="btn btn-secondary" id="importBtn">Restore Backup</button></div>
+        </div></div>
+        <div class="card no-print"><button type="button" class="btn btn-danger" id="clearBtn">Clear All Saved Information</button></div>
+      </section>
+      <div id="validationMsg" class="validation">Please complete all required fields on this page.</div>
+    </form>
+  </main>
+
+  <footer class="bottom-nav">
+    <div class="nav-inner"><button type="button" class="btn btn-secondary" id="prevBtn">Previous</button><div class="nav-label" id="navLabel">Primary client</div><button type="button" class="btn btn-primary" id="nextBtn">Next</button></div>
+  </footer>
+</div>
+
+<template id="beneficiaryTemplate"><div class="repeat-item"><button type="button" class="remove">Remove</button><p class="repeat-title">Beneficiary <span class="item-number"></span></p><div class="grid"><div class="col-4"><label>Name</label><input data-field="name"></div><div class="col-3"><label>Relationship</label><select data-field="relationship"><option value="">Select</option><option>Spouse</option><option>Non-Spouse</option></select></div><div class="col-3"><label>Type</label><select data-field="type"><option value="">Select</option><option>Primary</option><option>Contingent</option></select></div><div class="col-2"><label>Percentage</label><input type="number" min="0.01" max="100" step=".01" data-field="percentage"></div></div></div></template>
+<template id="childTemplate"><div class="repeat-item"><button type="button" class="remove">Remove</button><p class="repeat-title">Child / Grandchild <span class="item-number"></span></p><div class="grid"><div class="col-4"><label>Name</label><input data-field="name"></div><div class="col-3"><label>Relationship</label><input data-field="relationship"></div><div class="col-3"><label>Date of birth</label><input type="date" data-field="dob"></div><div class="col-2"><label>SSN</label><input data-field="ssn" autocomplete="off"></div></div></div></template>
+
+<script>
+(() => {
+  const STORAGE_KEY='clientInfoSheet.v1';
+  const PREVIOUS_KEY='clientInfoSheet.previous.v1';
+  let archivedExistingDraft=false;
+  const steps=[...document.querySelectorAll('.step')];
+  const labels=['Primary client','Primary employment & financial information','Secondary client','Secondary employment & financial information','Account goals','Beneficiaries','Children / grandchildren','Bank information','Review & finish'];
+  let current=0, saveTimer;
+  const form=document.getElementById('clientForm');
+  const $=id=>document.getElementById(id);
+  let deferredInstallPrompt=null;
+  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  function hideSplash(){const splash=$('splashScreen');if(!splash)return;setTimeout(()=>{splash.classList.add('hidden');setTimeout(()=>splash.remove(),300)},isStandalone?650:180)}
+  window.addEventListener('load',hideSplash,{once:true});setTimeout(hideSplash,1800);
+  // Service worker intentionally disabled in this recovery build to prevent stale cached files.
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;$('installAppBtn')?.classList.remove('hidden')});
+  $('installAppBtn')?.addEventListener('click',async()=>{if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$('installAppBtn').classList.add('hidden');return}const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);if(ios&&!isStandalone)$('iosInstallNote')?.classList.remove('hidden')});
+  $('closeIosInstall')?.addEventListener('click',()=>{$('iosInstallNote')?.classList.add('hidden');localStorage.setItem('clientInfoSheet.iosInstallDismissed','1')});
+  window.addEventListener('appinstalled',()=>{$('installAppBtn')?.classList.add('hidden');deferredInstallPrompt=null});
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!isStandalone&&!localStorage.getItem('clientInfoSheet.iosInstallDismissed')){$('installAppBtn')?.classList.remove('hidden')}
+
+  function setSaveState(text,type='ok'){ $('saveText').textContent=text; $('saveDot').className='dot'+(type==='busy'?' busy':type==='error'?' error':''); }
+  function pathSet(obj,path,val){ const parts=path.split('.'); let cur=obj; parts.forEach((p,i)=>{if(i===parts.length-1)cur[p]=val;else cur=cur[p]??={};}); }
+  function pathGet(obj,path){ return path.split('.').reduce((a,k)=>a?.[k],obj); }
+
+  const digits=value=>String(value||'').replace(/\D/g,'');
+  function formatSSN(value){const d=digits(value).slice(0,9);return d.length<=3?d:d.length<=5?`${d.slice(0,3)}-${d.slice(3)}`:`${d.slice(0,3)}-${d.slice(3,5)}-${d.slice(5)}`}
+  function formatPhone(value){const d=digits(value).slice(0,10);if(d.length<4)return d;if(d.length<7)return `(${d.slice(0,3)}) ${d.slice(3)}`;return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`}
+  function setupMasks(){document.querySelectorAll('input[name$=".ssn"], input[data-field="ssn"]').forEach(el=>{el.inputMode='numeric';el.placeholder='XXX-XX-XXXX';el.addEventListener('input',()=>el.value=formatSSN(el.value))});document.querySelectorAll('[data-phone]').forEach(el=>el.addEventListener('input',()=>el.value=formatPhone(el.value)))}
+  const employmentFields=prefix=>['employer','jobTitle','industry','statusDate','street','city','state','zip'].map(k=>form.querySelector(`[name="${prefix}.employment.${k}"]`));
+  function updateEmployment(client){
+    const prefix=client;const status=form.querySelector(`[name="${prefix}.employment.status"]`)?.value||'';const box=$(prefix+'EmploymentDetails');if(!box)return;
+    const secondaryOn=prefix==='primary'||$('secondaryToggle').checked;const show=!['','Student','Homemaker'].includes(status);box.classList.toggle('hidden',!show);
+    const employerRole=box.querySelector('[data-role="employer-name"]'), jobRole=box.querySelector('[data-role="job-title"]'), industryRole=box.querySelector('[data-role="industry"]'), dateRole=box.querySelector('[data-role="status-date"]');
+    employerRole.querySelector('[data-label]').textContent=status==='Business Owner'?'Business name':status==='Retired'||status==='Not Employed'?'Last employer name':'Employer name';
+    box.querySelector('[data-address-label]').textContent=status==='Business Owner'?'Business street':status==='Retired'||status==='Not Employed'?'Last employer street':'Employer street';
+    jobRole.classList.toggle('hidden',status==='Business Owner');industryRole.classList.toggle('hidden',!['Employed','Business Owner','Retired','Not Employed'].includes(status));dateRole.classList.toggle('hidden',!['Retired','Not Employed'].includes(status));dateRole.querySelector('[data-label]').textContent=status==='Retired'?'Date retired':'Last employment date';
+    const fields=employmentFields(prefix);fields.forEach(el=>{if(el)el.required=false});
+    if(show&&secondaryOn){['employer','industry','street','city','state','zip'].forEach(k=>{const el=form.querySelector(`[name="${prefix}.employment.${k}"]`);if(el)el.required=true});if(status!=='Business Owner')form.querySelector(`[name="${prefix}.employment.jobTitle"]`).required=true;if(['Retired','Not Employed'].includes(status))form.querySelector(`[name="${prefix}.employment.statusDate"]`).required=true}
+  }
+  function updateTrusted(){const p=form.querySelector('[name="trusted.usePhone"]').checked,e=form.querySelector('[name="trusted.useEmail"]').checked;$('trustedPhoneWrap').classList.toggle('hidden',!p);$('trustedEmailWrap').classList.toggle('hidden',!e);form.querySelector('[name="trusted.phone"]').required=p;form.querySelector('[name="trusted.email"]').required=e}
+  const debounce=(fn,ms=450)=>{let t;return(...args)=>{clearTimeout(t);t=setTimeout(()=>fn(...args),ms)}};
+  const US_STATE_CODES={
+    'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA','Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA','Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA','Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD','Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS','Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND','Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT','Vermont':'VT','Virginia':'VA','Washington':'WA','West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC'
+  };
+  function stateCode(value){
+    if(!value)return'';
+    const clean=String(value).trim();
+    if(clean.length===2)return clean.toUpperCase();
+    return US_STATE_CODES[clean]||clean;
+  }
+  function featureParts(f){
+    const p=f.properties||{};
+    const country=(p.countrycode||p.country_code||'').toUpperCase();
+    if(country&&country!=='US')return null;
+    const street=[p.housenumber,p.street].filter(Boolean).join(' ');
+    const city=p.city||p.town||p.village||p.hamlet||p.locality||p.county||'';
+    const state=stateCode(p.statecode||p.state||'');
+    const zip=p.postcode||'';
+    const label=[street||p.name,city,state,zip].filter(Boolean).join(', ');
+    return {label,street:street||p.name||'',city,state,zip,isTexas:state==='TX',name:p.name||'',lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null};
+  }
+  async function photonSearch(query,urlExtra=''){
+    try{
+      const url=`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=15&lang=en${urlExtra}`;
+      const r=await fetch(url);if(!r.ok)return[];
+      const j=await r.json();return (j.features||[]).map(featureParts).filter(Boolean);
+    }catch{return[]}
+  }
+  async function nominatimSearch(query){
+    try{
+      const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=us&limit=12&q=${encodeURIComponent(query)}`;
+      const r=await fetch(url,{headers:{'Accept':'application/json'}});if(!r.ok)return[];
+      const rows=await r.json();
+      return rows.map(row=>{
+        const a=row.address||{};
+        const street=[a.house_number,a.road||a.pedestrian||a.residential].filter(Boolean).join(' ');
+        const city=a.city||a.town||a.village||a.hamlet||a.municipality||a.county||'';
+        const state=stateCode(a.state||'');
+        const zip=a.postcode||'';
+        const label=[street||row.name,city,state,zip].filter(Boolean).join(', ');
+        return {label,street:street||row.name||'',city,state,zip,isTexas:state==='TX',name:row.name||'',lat:Number(row.lat)||null,lon:Number(row.lon)||null};
+      }).filter(x=>x.label&&x.street);
+    }catch{return[]}
+  }
+  async function geoSearch(q){
+    const query=q.trim();if(query.length<4)return[];
+    const hasState=/\b[A-Z]{2}\b/i.test(query)||Object.keys(US_STATE_CODES).some(x=>query.toLowerCase().includes(x.toLowerCase()));
+    const texasQuery=hasState?query:`${query}, Texas, USA`;
+    const nationwideQuery=`${query}, USA`;
+    const [texas,nationwide]=await Promise.all([
+      photonSearch(texasQuery,'&bbox=-106.65,25.84,-93.51,36.50'),
+      photonSearch(nationwideQuery)
+    ]);
+    let combined=[...texas,...nationwide];
+    if(combined.length<8)combined.push(...await nominatimSearch(nationwideQuery));
+    const seen=new Set();
+    return combined
+      .filter(x=>x.label&&x.street)
+      .sort((a,b)=>(b.isTexas?1:0)-(a.isTexas?1:0))
+      .filter(x=>{const key=x.label.toLowerCase();if(seen.has(key))return false;seen.add(key);return true})
+      .slice(0,18);
+  }
+  function fillAddress(prefix,x){
+    [['street',x.street],['city',x.city],['state',x.state],['zip',x.zip]].forEach(([k,v])=>{
+      const el=form.querySelector(`[name="${prefix}.${k}"]`);if(el&&v){el.value=v;el.dispatchEvent(new Event('change',{bubbles:true}))}
+    });
+    scheduleSave();
+  }
+  function clientHomeContext(employmentPrefix){
+    const client=employmentPrefix.split('.')[0];
+    const get=k=>form.querySelector(`[name="${client}.physical.${k}"]`)?.value?.trim()||'';
+    const street=get('street'),city=get('city'),state=get('state'),zip=get('zip');
+    const homeInput=form.querySelector(`[name="${client}.physical.street"]`);
+    return {street,city,state,zip,lat:Number(homeInput?.dataset.lat)||null,lon:Number(homeInput?.dataset.lon)||null,
+      text:[street,city,state,zip].filter(Boolean).join(', ')};
+  }
+  function businessPartsFromPhoton(f){
+    const p=f.properties||{};const country=(p.countrycode||p.country_code||'').toUpperCase();if(country&&country!=='US')return null;
+    const name=p.name||p.company||p.osm_value||'';
+    const street=[p.housenumber,p.street].filter(Boolean).join(' ');
+    const city=p.city||p.town||p.village||p.hamlet||p.locality||p.county||'';
+    const state=stateCode(p.statecode||p.state||'');const zip=p.postcode||'';
+    const address=[street,city,state,zip].filter(Boolean).join(', ');
+    if(!name||!address)return null;
+    return {name,street,city,state,zip,label:`${name} — ${address}`,isTexas:state==='TX',lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null};
+  }
+  async function businessSearch(query,employmentPrefix){
+    const q=query.trim();if(q.length<2)return[];
+    const home=clientHomeContext(employmentPrefix);
+    const location=[home.city,home.state,home.zip].filter(Boolean).join(', ');
+    const searchText=[q,location||'Texas','USA'].filter(Boolean).join(', ');
+    const photonExtra=home.lat&&home.lon?`&lat=${home.lat}&lon=${home.lon}`:(home.state==='TX'?'&bbox=-106.65,25.84,-93.51,36.50':'');
+    let results=[];
+    try{
+      const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchText)}&limit=18&lang=en${photonExtra}`);
+      if(r.ok){const j=await r.json();results.push(...(j.features||[]).map(businessPartsFromPhoton).filter(Boolean));}
+    }catch{}
+    try{
+      let url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&namedetails=1&countrycodes=us&limit=18&q=${encodeURIComponent(searchText)}`;
+      if(home.lat&&home.lon){const d=.55;url+=`&viewbox=${home.lon-d},${home.lat+d},${home.lon+d},${home.lat-d}&bounded=0`;}
+      const r=await fetch(url,{headers:{'Accept':'application/json'}});
+      if(r.ok){const rows=await r.json();results.push(...rows.map(row=>{
+        const a=row.address||{};const name=row.namedetails?.name||row.name||String(row.display_name||'').split(',')[0];
+        const street=[a.house_number,a.road||a.pedestrian||a.residential].filter(Boolean).join(' ');
+        const city=a.city||a.town||a.village||a.hamlet||a.municipality||a.county||'';
+        const state=stateCode(a.state||'');const zip=a.postcode||'';const address=[street,city,state,zip].filter(Boolean).join(', ');
+        return name&&address?{name,street,city,state,zip,label:`${name} — ${address}`,isTexas:state==='TX',lat:Number(row.lat)||null,lon:Number(row.lon)||null}:null;
+      }).filter(Boolean));}
+    }catch{}
+    const seen=new Set();
+    return results.sort((a,b)=>{
+      const ah=(home.city&&a.city.toLowerCase()===home.city.toLowerCase()?4:0)+(home.state&&a.state===home.state?2:0)+(a.isTexas?1:0);
+      const bh=(home.city&&b.city.toLowerCase()===home.city.toLowerCase()?4:0)+(home.state&&b.state===home.state?2:0)+(b.isTexas?1:0);return bh-ah;
+    }).filter(x=>{const k=`${x.name}|${x.street}|${x.city}|${x.state}`.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,18);
+  }
+  function setupAutocomplete(){
+    const attach=(input,isEmployer=false)=>{
+      const prefix=isEmployer?input.dataset.employerAutocomplete:input.dataset.addressAutocomplete;
+      const list=document.getElementById(input.getAttribute('list'));let map=new Map();
+      const choose=()=>{const x=map.get(input.value);if(x){if(isEmployer)input.value=x.name||x.label;else{input.dataset.lat=x.lat||'';input.dataset.lon=x.lon||'';}fillAddress(prefix,x)}};
+      const search=debounce(async()=>{
+        const items=isEmployer?await businessSearch(input.value,prefix):await geoSearch(input.value);
+        map=new Map(items.map(x=>[x.label,x]));
+        list.innerHTML=items.map(x=>`<option value="${esc(x.label)}"></option>`).join('');
+        choose();
+      },350);
+      input.addEventListener('input',()=>{if(!isEmployer){input.dataset.lat='';input.dataset.lon='';}search();setTimeout(choose,0)});
+      input.addEventListener('change',choose);input.addEventListener('blur',choose);
+    };
+    document.querySelectorAll('[data-address-autocomplete]').forEach(input=>attach(input,false));
+    document.querySelectorAll('[data-employer-autocomplete]').forEach(input=>attach(input,true));
+  }
+
+  function serialize(){
+    const data={meta:{version:2,savedAt:new Date().toISOString(),hasSecondary:$('secondaryToggle').checked,hasMailing:$('mailingToggle').checked},beneficiaries:{primary:[],secondary:[]},children:[]};
+    form.querySelectorAll('[name]').forEach(el=>pathSet(data,el.name,el.type==='checkbox'?el.checked:el.value));
+    document.querySelectorAll('[data-check-group]').forEach(group=>pathSet(data,group.dataset.checkGroup,[...group.querySelectorAll('input:checked')].map(x=>x.value)));
+    ['primary','secondary'].forEach(owner=>document.querySelectorAll(`#${owner}Beneficiaries .repeat-item`).forEach(item=>{const o={};item.querySelectorAll('[data-field]').forEach(el=>o[el.dataset.field]=el.value);if(Object.values(o).some(x=>String(x||'').trim()))data.beneficiaries[owner].push(o)}));
+    document.querySelectorAll('#children .repeat-item').forEach(item=>{const o={};item.querySelectorAll('[data-field]').forEach(el=>o[el.dataset.field]=el.value);data.children.push(o)});
+    data.settings={advisorEmail:$('advisorEmail').value};
+    return data;
+  }
+  function save(){ try{if(!archivedExistingDraft){const existing=localStorage.getItem(STORAGE_KEY);if(existing)localStorage.setItem(PREVIOUS_KEY,existing);archivedExistingDraft=true}localStorage.setItem(STORAGE_KEY,JSON.stringify(serialize()));setSaveState('Saved locally')}catch(e){setSaveState('Could not save','error')} }
+  function scheduleSave(){setSaveState('Saving…','busy');clearTimeout(saveTimer);saveTimer=setTimeout(save,350)}
+  function addRepeat(type,data={},owner='primary'){
+    const tpl=$(type+'Template').content.cloneNode(true); const container=$(type==='beneficiary'?owner+'Beneficiaries':'children'); const item=tpl.querySelector('.repeat-item');
+    item.dataset.owner=owner; item.querySelectorAll('[data-field]').forEach(el=>el.value=data[el.dataset.field]??'');
+    item.querySelector('.remove').onclick=()=>{item.remove();renumber();beneficiaryTotals(owner);scheduleSave()};
+    container.appendChild(tpl);renumber();item.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>beneficiaryTotals(owner)));beneficiaryTotals(owner);
+  }
+  function renumber(){['primary','secondary'].forEach(owner=>document.querySelectorAll(`#${owner}Beneficiaries .item-number`).forEach((x,i)=>x.textContent=i+1));document.querySelectorAll('#children .item-number').forEach((x,i)=>x.textContent=i+1)}
+  function hydrate(data){
+    if(!data)return;
+    form.querySelectorAll('[name]').forEach(el=>{const v=pathGet(data,el.name);if(v!==undefined)el.type==='checkbox'?el.checked=!!v:el.value=v});
+    document.querySelectorAll('[data-check-group]').forEach(group=>{const vals=pathGet(data,group.dataset.checkGroup)||[];group.querySelectorAll('input').forEach(x=>x.checked=vals.includes(x.value))});
+    $('mailingToggle').checked=!!data.meta?.hasMailing; toggleMailing(); $('secondaryToggle').checked=!!data.meta?.hasSecondary; toggleSecondary();
+    ['primary','secondary'].forEach(owner=>{$(owner+'Beneficiaries').innerHTML='';const list=Array.isArray(data.beneficiaries)?(owner==='primary'?data.beneficiaries:[]):(data.beneficiaries?.[owner]||[]);list.forEach(x=>addRepeat('beneficiary',x,owner));if(!list.length)addRepeat('beneficiary',{},owner)})
+    $('children').innerHTML='';(data.children||[]).forEach(x=>addRepeat('child',x));if(!(data.children||[]).length)addRepeat('child')
+    $('advisorEmail').value=data.settings?.advisorEmail||''; updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();syncMarriedSecondary();syncSpouseBeneficiaries();beneficiaryTotals('primary');beneficiaryTotals('secondary');setSaveState('Saved draft restored');
+  }
+  function resetBlank(){
+    form.reset();$('primaryBeneficiaries').innerHTML='';$('secondaryBeneficiaries').innerHTML='';$('children').innerHTML='';
+    addRepeat('beneficiary',{},'primary');addRepeat('beneficiary',{},'secondary');addRepeat('child');
+    $('advisorEmail').value='';toggleMailing();toggleSecondary();updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();showStep(0);setSaveState('Blank profile');
+  }
+  function showSavedDraftOption(){
+    const raw=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(PREVIOUS_KEY);if(!raw)return;
+    try{const d=JSON.parse(raw),name=[d.primary?.firstName,d.primary?.lastName].filter(Boolean).join(' ')||'Saved client';$('savedDraftDetails').textContent=`${name} — saved ${d.meta?.savedAt?new Date(d.meta.savedAt).toLocaleString():'locally'}.`; $('savedDraftBanner').classList.remove('hidden')}catch{$('savedDraftBanner').classList.remove('hidden');$('savedDraftDetails').textContent='A locally saved sheet is available.'}
+  }
+  function loadSavedDraft(){
+    try{const raw=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(PREVIOUS_KEY);if(!raw){alert('No saved client sheet was found.');return}hydrate(JSON.parse(raw));$('savedDraftBanner').classList.add('hidden');archivedExistingDraft=true;showStep(0)}catch(e){setSaveState('Saved draft needs attention','error');alert('The saved client sheet could not be opened.')}
+  }
+  function toggleMailing(){ $('mailingFields').classList.toggle('hidden',!$('mailingToggle').checked) }
+  function updatePreferred(owner){const select=form.querySelector(`[name="${owner}.preferred.use"]`);const field=$(owner+'PreferredNameField');const input=form.querySelector(`[name="${owner}.preferred.name"]`);const show=select?.value==='Yes'&&(owner==='primary'||$('secondaryToggle').checked);field?.classList.toggle('hidden',!show);if(input)input.required=!!show;}
+  function toggleSecondary(){const on=$('secondaryToggle').checked;$('secondaryFields').classList.toggle('hidden',!on);$('secondaryBeneficiaryCard').classList.toggle('hidden',!on);document.querySelectorAll('[data-secondary-required]').forEach(el=>el.required=on);updateEmployment('secondary');updatePreferred('secondary');syncMarriedSecondary();syncSpouseBeneficiaries()}
+  function showStep(n){current=Math.max(0,Math.min(steps.length-1,n));steps.forEach((s,i)=>s.classList.toggle('active',i===current));$('progressBar').style.width=((current+1)/steps.length*100)+'%';$('prevBtn').style.visibility=current===0?'hidden':'visible';$('nextBtn').textContent=current===steps.length-1?'Back to Start':'Next';$('navLabel').textContent=labels[current];$('validationMsg').style.display='none';if(current===steps.length-1)renderReview();window.scrollTo({top:0,behavior:'smooth'})}
+  function validateCurrent(){const active=steps[current];let ok=true;if(current===5&&!validateBeneficiaries())return false;active.querySelectorAll('[required]').forEach(el=>{if(!el.value){ok=false;el.reportValidity()}});if(active.querySelector('[data-trusted-methods]')&&!form.querySelector('[name="trusted.usePhone"]').checked&&!form.querySelector('[name="trusted.useEmail"]').checked){ok=false;alert('Select phone, email, or both for the trusted contact.')} $('validationMsg').style.display=ok?'none':'block';return ok}
+  const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const v=x=>x||'—';
+  function rows(obj,pairs){return '<div class="review-grid">'+pairs.map(([label,path])=>`<div class="review-row"><b>${label}</b><span>${esc(v(pathGet(obj,path)))}</span></div>`).join('')+'</div>'}
+  function reviewSection(title,content){return `<div class="review-section"><h3>${esc(title)}</h3>${content}</div>`}
+  function beneficiaryReview(list){return list.length?'<ol class="review-list">'+list.map(x=>`<li>${esc(v(x.name))} — ${esc(v(x.relationship))}, ${esc(v(x.type))}, ${esc(v(x.percentage))}%</li>`).join('')+'</ol>':'—'}
+  function renderReview(){
+    const d=serialize(), prepared=new Date().toLocaleDateString('en-US');
+    const full=o=>[o?.firstName,o?.middleName,o?.lastName].filter(Boolean).join(' ');
+    const personal=(owner,label)=>reviewSection(`${label} Personal Information`,rows(d,[['Name',`${owner}.firstName`],['Middle name',`${owner}.middleName`],['Last name',`${owner}.lastName`],['Goes by',`${owner}.preferred.name`],['Date of birth',`${owner}.dob`],['SSN / EIN',`${owner}.ssn`],['Marital status',`${owner}.maritalStatus`],['Email',`${owner}.email`],['Email type',`${owner}.emailType`],['Phone',`${owner}.phone`],['Phone type',`${owner}.phoneType`],['Physical address',`${owner}.physical.street`],['City',`${owner}.physical.city`],['State',`${owner}.physical.state`],['ZIP',`${owner}.physical.zip`]]));
+    const employment=(owner,label)=>reviewSection(`${label} Employment Information`,rows(d,[['Employment status',`${owner}.employment.status`],['Employer / business',`${owner}.employment.employer`],['Job title',`${owner}.employment.jobTitle`],['Industry',`${owner}.employment.industry`],['Employment status date',`${owner}.employment.statusDate`],['Employer street',`${owner}.employment.address.street`],['Employer city',`${owner}.employment.address.city`],['Employer state',`${owner}.employment.address.state`],['Employer ZIP',`${owner}.employment.address.zip`]]));
+    const financial=(owner,label)=>reviewSection(`${label} Financial Information`,rows(d,[['Income range',`${owner}.financial.incomeRange`],['Net worth',`${owner}.financial.netWorth`],['Liquid net worth',`${owner}.financial.liquidNetWorth`]])+`<div class="review-row"><b>Source of wealth</b><span>${esc((pathGet(d,owner+'.financial.sourceOfWealth')||[]).join(', ')||'—')}</span></div>`);
+    const primaryLeft=personal('primary','Primary')+employment('primary','Primary')+financial('primary','Primary');
+    let primaryRight=reviewSection('Account Profile & Trusted Contact',rows(d,[['Purpose','account.purpose'],['Time horizon','account.timeHorizon'],['Risk tolerance','account.riskTolerance'],['Trusted contact first name','trusted.firstName'],['Trusted contact last name','trusted.lastName'],['Trusted contact phone','trusted.phone'],['Trusted contact email','trusted.email']]));
+    primaryRight+=reviewSection('Primary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.primary||[]));
+    primaryRight+=reviewSection('Children or Grandchildren',d.children.length?'<ol class="review-list">'+d.children.map(x=>`<li>${esc(v(x.name))} — ${esc(v(x.relationship))}, DOB ${esc(v(x.dob))}, SSN ${esc(v(x.ssn))}</li>`).join('')+'</ol>':'—');
+    primaryRight+=reviewSection('Bank Information',rows(d,[['Bank name','bank.name'],['Routing number','bank.routing'],['Account number','bank.account'],['Day of month','bank.day'],['Starting date','bank.startDate'],['Amount','bank.amount']]));
+    let html=`<section class="print-client-page"><div class="print-page-title"><span>Primary Account Holder — ${esc(full(d.primary)||'Prospective Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns"><div>${primaryLeft}</div><div>${primaryRight}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;
+    if(d.meta.hasSecondary){const secondaryLeft=personal('secondary','Secondary')+employment('secondary','Secondary')+financial('secondary','Secondary');const secondaryRight=reviewSection('Secondary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.secondary||[]));html+=`<section class="print-client-page"><div class="print-page-title"><span>Secondary Account Holder — ${esc(full(d.secondary)||'Secondary Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns"><div>${secondaryLeft}</div><div>${secondaryRight}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;}
+    $('reviewContent').innerHTML=html;
+  }
+  function ordinal(n){const j=n%10,k=n%100;return n+(j===1&&k!==11?'st':j===2&&k!==12?'nd':j===3&&k!==13?'rd':'th')}
+  function setupBankFields(){const day=$('bankDay');if(day&&!day.options.length){day.innerHTML='<option value="">Select</option>'}if(day&&day.options.length===1){for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=ordinal(i);o.textContent=ordinal(i);day.appendChild(o)}}document.querySelectorAll('[data-currency]').forEach(el=>{const format=()=>{const raw=el.value.replace(/[^0-9.]/g,'');if(!raw){el.value='';return}const num=Number(raw);if(Number.isFinite(num))el.value=num.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2})};el.addEventListener('blur',format);el.addEventListener('focus',()=>{el.value=el.value.replace(/[$,]/g,'')})})}
+  function beneficiaryTotals(owner='primary'){let primary=0,contingent=0;document.querySelectorAll(`#${owner}Beneficiaries .repeat-item`).forEach(item=>{const type=item.querySelector('[data-field="type"]')?.value;const pct=parseFloat(item.querySelector('[data-field="percentage"]')?.value)||0;if(type==='Primary')primary+=pct;if(type==='Contingent')contingent+=pct});const box=$(owner+'BeneficiaryTotals');if(box){box.textContent=`Primary total: ${primary.toFixed(2).replace('.00','')}% | Contingent total: ${contingent.toFixed(2).replace('.00','')}%`;const hasContingent=contingent>0;box.classList.toggle('warning',Math.abs(primary-100)>.001||(hasContingent&&Math.abs(contingent-100)>.001))}return {primary,contingent}}
+  function validateBeneficiaries(){for(const owner of $('secondaryToggle').checked?['primary','secondary']:['primary']){const items=[...document.querySelectorAll(`#${owner}Beneficiaries .repeat-item`)];const entered=items.filter(item=>[...item.querySelectorAll('[data-field]')].some(el=>String(el.value||'').trim()));if(!entered.length)continue;for(const item of entered){const missing=[...item.querySelectorAll('[data-field]')].some(el=>!String(el.value||'').trim());if(missing){alert(`${owner==='primary'?'Primary':'Secondary'} account holder beneficiary entries must be fully completed or removed.`);return false}}const primary=entered.filter(i=>i.querySelector('[data-field="type"]')?.value==='Primary').reduce((n,i)=>n+(parseFloat(i.querySelector('[data-field="percentage"]')?.value)||0),0);const contingent=entered.filter(i=>i.querySelector('[data-field="type"]')?.value==='Contingent').reduce((n,i)=>n+(parseFloat(i.querySelector('[data-field="percentage"]')?.value)||0),0);const label=owner==='primary'?'Primary account holder':'Secondary account holder';if(primary>0&&Math.abs(primary-100)>.001){alert(`${label} primary beneficiary percentages must add up to 100%.`);return false}if(contingent>0&&Math.abs(contingent-100)>.001){alert(`${label} contingent beneficiary percentages must add up to 100%.`);return false}}return true}
+  function fullName(prefix){return [form.querySelector(`[name="${prefix}.firstName"]`)?.value,form.querySelector(`[name="${prefix}.middleName"]`)?.value,form.querySelector(`[name="${prefix}.lastName"]`)?.value].filter(Boolean).join(' ').trim()}
+  function syncMarriedSecondary(){if(!$('secondaryToggle').checked||form.querySelector('[name="primary.maritalStatus"]')?.value!=='Married')return;form.querySelector('[name="secondary.maritalStatus"]').value='Married';['street','city','state','zip'].forEach(k=>{const src=form.querySelector(`[name="primary.physical.${k}"]`),dst=form.querySelector(`[name="secondary.physical.${k}"]`);if(src&&dst)dst.value=src.value})}
+  function syncSpouseBeneficiaries(){if(!$('secondaryToggle').checked)return;const married=form.querySelector('[name="primary.maritalStatus"]')?.value==='Married';const texas=(form.querySelector('[name="primary.physical.state"]')?.value||'').trim().toUpperCase()==='TX';if(!(married&&texas))return;[['primary','secondary'],['secondary','primary']].forEach(([owner,spouse])=>{const spouseName=fullName(spouse);if(!spouseName)return;const container=$(owner+'Beneficiaries');let items=[...container.querySelectorAll('.repeat-item')];let target=items.find(i=>i.querySelector('[data-field="type"]')?.value==='Primary');if(!target){addRepeat('beneficiary',{type:'Primary',percentage:'100'},owner);target=[...container.querySelectorAll('.repeat-item')].at(-1)}target.querySelector('[data-field="name"]').value=spouseName;target.querySelector('[data-field="relationship"]').value='Spouse';target.querySelector('[data-field="type"]').value='Primary';target.querySelector('[data-field="percentage"]').value='100';items.filter(i=>i!==target&&i.querySelector('[data-field="type"]')?.value==='Primary').forEach(i=>i.querySelector('[data-field="type"]').value='Contingent');beneficiaryTotals(owner)})}
+  function pdfSections(){
+    const d=serialize(), sections=[];
+    const address=o=>[o?.street,o?.city,o?.state,o?.zip].filter(Boolean).join(', ');
+    const full=o=>[o?.firstName,o?.middleName,o?.lastName].filter(Boolean).join(' ');
+    const add=(title,rows)=>sections.push({title,rows:rows.map(([label,value])=>[label,value||'—'])});
+    add('Primary Client',[
+      ['Name',full(d.primary)],['Date of Birth',d.primary?.dob],['SSN / EIN',d.primary?.ssn],['Marital Status',d.primary?.maritalStatus],
+      ['Email',`${d.primary?.emailType||''}${d.primary?.emailType?' — ':''}${d.primary?.email||''}`],['Phone',`${d.primary?.phoneType||''}${d.primary?.phoneType?' — ':''}${d.primary?.phone||''}`],
+      ['Physical Address',address(d.primary?.physical)],['Mailing Address',d.meta?.hasMailing?address(d.primary?.mailing):'Same as physical address']
+    ]);
+    add('Primary Employment Information',[
+      ['Employment Status',d.primary?.employment?.status],['Employer / Business',d.primary?.employment?.employer],['Job Title',d.primary?.employment?.jobTitle],
+      ['Industry',d.primary?.employment?.industry],['Status Date',d.primary?.employment?.statusDate],['Employer Address',address(d.primary?.employment?.address)]
+    ]);
+    add('Primary Financial Information',[
+      ['Income Range',d.primary?.financial?.incomeRange],['Net Worth',d.primary?.financial?.netWorth],['Liquid Net Worth',d.primary?.financial?.liquidNetWorth],
+      ['Source of Wealth',(d.primary?.financial?.sourceOfWealth||[]).join(', ')]
+    ]);
+    if(d.meta?.hasSecondary){
+      add('Secondary Client',[
+        ['Name',full(d.secondary)],['Date of Birth',d.secondary?.dob],['SSN / EIN',d.secondary?.ssn],['Marital Status',d.secondary?.maritalStatus],
+        ['Email',`${d.secondary?.emailType||''}${d.secondary?.emailType?' — ':''}${d.secondary?.email||''}`],['Phone',`${d.secondary?.phoneType||''}${d.secondary?.phoneType?' — ':''}${d.secondary?.phone||''}`],
+        ['Physical Address',address(d.secondary?.physical)]
+      ]);
+      add('Secondary Employment Information',[
+        ['Employment Status',d.secondary?.employment?.status],['Employer / Business',d.secondary?.employment?.employer],['Job Title',d.secondary?.employment?.jobTitle],
+        ['Industry',d.secondary?.employment?.industry],['Status Date',d.secondary?.employment?.statusDate],['Employer Address',address(d.secondary?.employment?.address)]
+      ]);
+      add('Secondary Financial Information',[
+        ['Income Range',d.secondary?.financial?.incomeRange],['Net Worth',d.secondary?.financial?.netWorth],['Liquid Net Worth',d.secondary?.financial?.liquidNetWorth],
+        ['Source of Wealth',(d.secondary?.financial?.sourceOfWealth||[]).join(', ')]
+      ]);
+    }
+    add('Account Profile & Trusted Contact',[
+      ['Account Purpose',d.account?.purpose],['Time Horizon',d.account?.timeHorizon],['Risk Tolerance',d.account?.riskTolerance],
+      ['Trusted Contact',full(d.trusted)],['Trusted Phone',d.trusted?.phone],['Trusted Email',d.trusted?.email]
+    ]);
+    ['primary','secondary'].forEach(owner=>{
+      if(owner==='secondary'&&!d.meta?.hasSecondary)return;
+      const rows=(d.beneficiaries?.[owner]||[]).map((x,i)=>[`Beneficiary ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | ${x.type||'—'} | ${x.percentage||'—'}%`]);
+      add(`${owner==='primary'?'Primary':'Secondary'} Account Holder Beneficiaries`,rows.length?rows:[['Beneficiaries','—']]);
+    });
+    const kids=(d.children||[]).map((x,i)=>[`Child / Grandchild ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | DOB ${x.dob||'—'} | SSN ${x.ssn||'—'}`]);
+    add('Children or Grandchildren',kids.length?kids:[['Children / Grandchildren','—']]);
+    add('Bank Information',[
+      ['Bank Name',d.bank?.name],['Routing Number',d.bank?.routing],['Account Number',d.bank?.account],['Day of Month',d.bank?.day],['Starting Date',d.bank?.startDate],['Amount',d.bank?.amount]
+    ]);
+    return sections;
+  }
+  function makePdfBlob(){
+    const d=serialize();
+    const escPdf=t=>String(t??'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7E]/g,' ');
+    const clean=t=>String(t??'').trim();
+    const formatDate=value=>{if(!value)return '';const p=String(value).split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0]}`:String(value)};
+    const address=o=>[o?.street,o?.city,o?.state,o?.zip].filter(Boolean).join(', ');
+    const full=o=>[o?.firstName,o?.middleName,o?.lastName].filter(Boolean).join(' ');
+    const advisorSelect=document.getElementById('advisorEmail');
+    const advisor=advisorSelect?.selectedIndex>0?advisorSelect.options[advisorSelect.selectedIndex].text.split(' — ')[0]:'Not selected';
+    const prepared=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const pageSpec=[];
+    pageSpec.push({name:`Primary Account Holder — ${full(d.primary)||'Prospective Client'}`,left:[
+      {title:'Personal Information',rows:[['Name',full(d.primary)],['Date of Birth',formatDate(d.primary?.dob)],['SSN / EIN',d.primary?.ssn],['Marital Status',d.primary?.maritalStatus],['Email',`${d.primary?.emailType||''}${d.primary?.emailType?' — ':''}${d.primary?.email||''}`],['Phone',`${d.primary?.phoneType||''}${d.primary?.phoneType?' — ':''}${d.primary?.phone||''}`],['Physical Address',address(d.primary?.physical)],['Mailing Address',d.meta?.hasMailing?address(d.primary?.mailing):'Same as physical address']]},
+      {title:'Employment Information',rows:[['Employment Status',d.primary?.employment?.status],['Employer / Business',d.primary?.employment?.employer],['Job Title',d.primary?.employment?.jobTitle],['Industry',d.primary?.employment?.industry],['Status Date',formatDate(d.primary?.employment?.statusDate)],['Employer Address',address(d.primary?.employment?.address)]]},
+      {title:'Financial Information',rows:[['Income Range',d.primary?.financial?.incomeRange],['Net Worth',d.primary?.financial?.netWorth],['Liquid Net Worth',d.primary?.financial?.liquidNetWorth],['Source of Wealth',(d.primary?.financial?.sourceOfWealth||[]).join(', ')]]}
+    ],right:[
+      {title:'Account Profile & Trusted Contact',rows:[['Account Purpose',d.account?.purpose],['Time Horizon',d.account?.timeHorizon],['Risk Tolerance',d.account?.riskTolerance],['Trusted Contact',full(d.trusted)],['Trusted Phone',d.trusted?.phone],['Trusted Email',d.trusted?.email]]},
+      {title:'Primary Beneficiaries',rows:(d.beneficiaries?.primary||[]).map((x,i)=>[`Beneficiary ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | ${x.type||'—'} | ${x.percentage||'—'}%`])},
+      {title:'Children or Grandchildren',rows:(d.children||[]).map((x,i)=>[`Child / Grandchild ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | DOB ${formatDate(x.dob)||'—'} | SSN ${x.ssn||'—'}`])},
+      {title:'Bank Information',rows:[['Bank Name',d.bank?.name],['Routing Number',d.bank?.routing],['Account Number',d.bank?.account],['Day of Month',d.bank?.day],['Starting Date',formatDate(d.bank?.startDate)],['Amount',d.bank?.amount]]}
+    ]});
+    if(d.meta?.hasSecondary){pageSpec.push({name:`Secondary Account Holder — ${full(d.secondary)||'Secondary Client'}`,left:[
+      {title:'Personal Information',rows:[['Name',full(d.secondary)],['Date of Birth',formatDate(d.secondary?.dob)],['SSN / EIN',d.secondary?.ssn],['Marital Status',d.secondary?.maritalStatus],['Email',`${d.secondary?.emailType||''}${d.secondary?.emailType?' — ':''}${d.secondary?.email||''}`],['Phone',`${d.secondary?.phoneType||''}${d.secondary?.phoneType?' — ':''}${d.secondary?.phone||''}`],['Physical Address',address(d.secondary?.physical)]]},
+      {title:'Employment Information',rows:[['Employment Status',d.secondary?.employment?.status],['Employer / Business',d.secondary?.employment?.employer],['Job Title',d.secondary?.employment?.jobTitle],['Industry',d.secondary?.employment?.industry],['Status Date',formatDate(d.secondary?.employment?.statusDate)],['Employer Address',address(d.secondary?.employment?.address)]]},
+      {title:'Financial Information',rows:[['Income Range',d.secondary?.financial?.incomeRange],['Net Worth',d.secondary?.financial?.netWorth],['Liquid Net Worth',d.secondary?.financial?.liquidNetWorth],['Source of Wealth',(d.secondary?.financial?.sourceOfWealth||[]).join(', ')]]}
+    ],right:[{title:'Secondary Beneficiaries',rows:(d.beneficiaries?.secondary||[]).map((x,i)=>[`Beneficiary ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | ${x.type||'—'} | ${x.percentage||'—'}%`])}]});}
+    const pages=[],rgb=(r,g,b)=>`${r} ${g} ${b} rg`,stroke=(r,g,b)=>`${r} ${g} ${b} RG`;
+    for(const spec of pageSpec){
+      const ops=[];
+      const text=(x,y,size,str,bold=false,color=[.12,.16,.22])=>ops.push(`${rgb(...color)} BT /${bold?'F2':'F1'} ${size} Tf ${x} ${y} Td (${escPdf(str)}) Tj ET`);
+      const fill=(x,y,w,h,c)=>ops.push(`${rgb(...c)} ${x} ${y} ${w} ${h} re f`);
+      const box=(x,y,w,h)=>ops.push(`${stroke(.84,.87,.90)} .45 w ${x} ${y} ${w} ${h} re S`);
+      const wrap=(value,max=34)=>{const raw=clean(value)||'Not provided',words=raw.split(/\s+/),out=[];let cur='';for(const w of words){const n=(cur+' '+w).trim();if(n.length>max&&cur){out.push(cur);cur=w}else cur=n}if(cur)out.push(cur);return out.slice(0,3)};
+      fill(0,744,612,48,[.09,.18,.30]);text(36,765,15,'CLIENT INFORMATION SHEET',true,[1,1,1]);text(36,750,7.5,'CONFIDENTIAL - FOR ADVISOR USE',false,[.86,.90,.95]);
+      fill(36,701,540,32,[.95,.97,.985]);box(36,701,540,32);text(45,718,11,spec.name,true,[.08,.16,.25]);text(430,718,7,'PREPARED',true,[.34,.39,.46]);text(474,718,7.5,prepared);text(430,706,7,'ADVISOR',true,[.34,.39,.46]);text(474,706,7.5,advisor);
+      const drawColumn=(sections,x,w)=>{const active=sections.map(s=>({title:s.title,rows:s.rows.filter(r=>clean(r[1]))})).filter(s=>s.rows.length);const totalRows=active.reduce((n,s)=>n+s.rows.length,0),rowH=Math.max(14,Math.min(19,(638-active.length*25)/Math.max(totalRows,1)));let y=688;for(const sec of active){fill(x,y-20,w,20,[.89,.93,.97]);fill(x,y-20,4,20,[.13,.37,.62]);text(x+10,y-14,8.5,sec.title.toUpperCase(),true,[.08,.22,.38]);y-=24;for(const [label,val] of sec.rows){const lines=wrap(val,34),h=Math.max(rowH,lines.length*8+5);fill(x,y-h,w,h,[.988,.99,.993]);box(x,y-h,w,h);text(x+7,y-10,6.5,label.toUpperCase(),true,[.36,.40,.46]);lines.forEach((ln,i)=>text(x+94,y-10-i*8,7.8,ln,false,[.08,.10,.14]));y-=h+2;}y-=5;}};
+      drawColumn(spec.left,36,264);drawColumn(spec.right,312,264);
+      ops.push(`${stroke(.78,.81,.85)} .5 w 36 30 m 576 30 l S`);text(36,17,6.5,'Confidential - Client Information Sheet');text(523,17,6.5,`Page ${pages.length+1} of ${pageSpec.length}`);pages.push(ops.join('\n'));
+    }
+    const objects=[];objects[1]='<< /Type /Catalog /Pages 2 0 R >>';const kids=[];let obj=3;pages.forEach(()=>{kids.push(`${obj} 0 R`);obj+=2});objects[2]=`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;const font1=3+pages.length*2,font2=font1+1;obj=3;pages.forEach(stream=>{const contentObj=obj+1;objects[obj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentObj} 0 R >>`;objects[contentObj]=`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;obj+=2});objects[font1]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';objects[font2]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';let pdf='%PDF-1.4\n',offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=pdf.length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return new Blob([pdf],{type:'application/pdf'});
+  }
+  function blobToBase64(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob)})}
+  async function createAttachedEmail(email,blob,filename){
+    const d=serialize(),client=[d.primary?.firstName,d.primary?.lastName].filter(Boolean).join(' ')||'Prospect';
+    const subject=`Completed Client Information Sheet - ${client}`;
+    const body=`Please find the completed Client Information Sheet attached.\r\n\r\nPrimary client: ${client}\r\nSubmitted: ${new Date().toLocaleDateString()}`;
+    if(navigator.canShare){const file=new File([blob],filename,{type:'application/pdf'});if(navigator.canShare({files:[file]})){try{await navigator.share({title:subject,text:`To: ${email}\n\n${body}`,files:[file]});return}catch(e){if(e.name==='AbortError')return}}}
+    const b64=await blobToBase64(blob),boundary='----ClientInfoBoundary'+Date.now();
+    const eml=[`To: ${email}`,`Subject: ${subject}`,'MIME-Version: 1.0',`Content-Type: multipart/mixed; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: 8bit','',body,'',`--${boundary}`,`Content-Type: application/pdf; name="${filename}"`,'Content-Transfer-Encoding: base64',`Content-Disposition: attachment; filename="${filename}"`,'',b64.match(/.{1,76}/g).join('\r\n'),'',`--${boundary}--`].join('\r\n');
+    downloadBlob(fileBase()+'_Attached_Email.eml',new Blob([eml],{type:'message/rfc822'}));
+    alert('The attached email file was created. Open the downloaded .eml file to launch your email program with the PDF attached.');
+  }
+  function downloadBlob(filename,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+  function download(filename,text,type='application/json'){const blob=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+  function fileBase(){const d=serialize();return ((d.primary?.lastName||'Client')+'_'+(d.primary?.firstName||'Information')).replace(/[^a-z0-9_-]+/gi,'_')}
+
+  form.addEventListener('input',scheduleSave);form.addEventListener('change',scheduleSave);document.querySelectorAll('[data-employment-status]').forEach(el=>el.addEventListener('change',()=>updateEmployment(el.dataset.employmentStatus)));document.querySelectorAll('[data-trusted-methods] input').forEach(el=>el.addEventListener('change',updateTrusted));
+  document.querySelectorAll('[data-preferred-toggle]').forEach(el=>el.addEventListener('change',()=>{updatePreferred(el.dataset.preferredToggle);scheduleSave()}));
+  $('mailingToggle').addEventListener('change',()=>{toggleMailing();scheduleSave()});$('secondaryToggle').addEventListener('change',()=>{toggleSecondary();scheduleSave()});['primary.maritalStatus','primary.physical.street','primary.physical.city','primary.physical.state','primary.physical.zip','primary.firstName','primary.middleName','primary.lastName','secondary.firstName','secondary.middleName','secondary.lastName'].forEach(n=>form.querySelector(`[name="${n}"]`)?.addEventListener('input',()=>{syncMarriedSecondary();syncSpouseBeneficiaries()}));
+  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addRepeat(b.dataset.add);scheduleSave()});
+  $('prevBtn').onclick=()=>showStep(current===4&&!$('secondaryToggle').checked?2:current-1);$('nextBtn').onclick=()=>{if(current===steps.length-1){showStep(0);return}if(validateCurrent())showStep(current===2&&!$('secondaryToggle').checked?4:current+1)};
+  $('printBtn').onclick=()=>{renderReview();window.print()};
+  $('exportBtn').onclick=()=>download(fileBase()+'_backup.json',JSON.stringify(serialize(),null,2));
+  $('emailBtn').onclick=async()=>{const email=$('advisorEmail').value.trim();if(!email){$('advisorEmail').focus();alert('Select a financial advisor first.');return}const blob=makePdfBlob(),filename=fileBase()+'_Client_Information.pdf';await createAttachedEmail(email,blob,filename)};
+  $('shareBtn').onclick=async()=>{const blob=makePdfBlob(),file=new File([blob],fileBase()+'_Client_Information.pdf',{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({title:'Completed Client Information Sheet',text:'Completed client information sheet',files:[file]})}catch(e){if(e.name!=='AbortError')alert('The PDF could not be shared.')}}else{downloadBlob(file.name,blob);alert('This browser cannot open a file-sharing menu. The formatted PDF was downloaded instead.')}};
+  $('resumeSavedBtn').onclick=loadSavedDraft;
+  $('dismissSavedBtn').onclick=()=>$('savedDraftBanner').classList.add('hidden');
+  $('importBtn').onclick=()=>{const f=$('importFile').files[0];if(!f){alert('Choose a backup file first.');return}const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);hydrate(d);save();showStep(0);alert('Backup restored.')}catch(e){alert('That file could not be restored.')}};r.readAsText(f)};
+  $('clearBtn').onclick=()=>{if(confirm('Clear all information saved in this browser? This cannot be undone unless you downloaded a backup.')){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(PREVIOUS_KEY);archivedExistingDraft=true;resetBlank();$('savedDraftBanner').classList.add('hidden');setSaveState('No saved draft')}};
+  addRepeat('beneficiary',{},'primary');addRepeat('beneficiary',{},'secondary');addRepeat('child');setupMasks();setupBankFields();setupAutocomplete();resetBlank();showSavedDraftOption();
+})();
+</script>
+</body>
+</html>
