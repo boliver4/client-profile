@@ -1,15 +1,9 @@
-# Client Information Sheet — v17 Test Mode
+# Client Information Sheet — v19 Test Mode
 
-Deployable GitHub/Vercel package.
+Print/PDF correction:
+- One primary client = exactly one client page.
+- Primary + secondary = exactly two client pages.
+- Print layout is compressed into three columns per client to keep fully populated test data on one letter-size page per client.
+- Temporary TEST: Fill Random Data remains enabled.
 
-Files:
-- index.html — complete single-file application
-- vercel.json — static deployment/no-cache headers
-- README.md — deployment notes
-
-The iPhone/iPad home-screen icon is embedded directly in index.html.
-
-This version still includes the temporary TEST: Fill Random Data button.
-
-GitHub:
-Upload index.html, vercel.json, and README.md to the ROOT of the repository.
+Upload all files in this ZIP to the root of your GitHub repository.

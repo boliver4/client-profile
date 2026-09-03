@@ -794,6 +794,147 @@
   }
 </style>
 
+
+<style id="singlePagePerClientPrintV19">
+@media print{
+  @page{
+    size:letter portrait;
+    margin:.22in;
+  }
+
+  html,body{
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    background:#fff!important;
+  }
+
+  body{
+    font-size:7.25px!important;
+    line-height:1.08!important;
+  }
+
+  #reviewContent{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  #reviewContent .print-client-page{
+    width:100%!important;
+    height:10.48in!important;
+    max-height:10.48in!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    margin:0!important;
+    padding:0!important;
+    break-inside:avoid-page!important;
+    page-break-inside:avoid!important;
+    page-break-after:always!important;
+    break-after:page!important;
+  }
+
+  #reviewContent .print-client-page:last-child{
+    page-break-after:auto!important;
+    break-after:auto!important;
+  }
+
+  .print-page-title{
+    min-height:0!important;
+    padding:7px 9px!important;
+    margin:0 0 5px!important;
+    font-size:12px!important;
+    line-height:1.05!important;
+    align-items:center!important;
+  }
+
+  .print-page-title small,
+  .print-page-title .prepared-date{
+    font-size:6.5px!important;
+    line-height:1!important;
+  }
+
+  .print-columns.print-columns-three{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:5px!important;
+    align-items:start!important;
+  }
+
+  .review-section{
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+    border:1px solid #d9dee6!important;
+    border-radius:4px!important;
+    margin:0 0 4px!important;
+    padding:4px!important;
+    min-width:0!important;
+  }
+
+  .review-section h3{
+    margin:-4px -4px 3px!important;
+    padding:3px 4px!important;
+    font-size:7.4px!important;
+    line-height:1.05!important;
+    background:#eaf0f7!important;
+  }
+
+  .review-grid{
+    display:block!important;
+  }
+
+  .review-row{
+    display:grid!important;
+    grid-template-columns:41% 59%!important;
+    gap:3px!important;
+    padding:1.8px 0!important;
+    line-height:1.06!important;
+    min-width:0!important;
+  }
+
+  .review-row b{
+    min-width:0!important;
+    font-size:5.7px!important;
+    line-height:1.05!important;
+    text-transform:uppercase!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  .review-row span{
+    min-width:0!important;
+    font-size:6.5px!important;
+    line-height:1.06!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+
+  .review-list{
+    margin:2px 0 0!important;
+    padding-left:12px!important;
+    font-size:6.4px!important;
+    line-height:1.08!important;
+  }
+
+  .review-list li{
+    margin:0 0 2px!important;
+    padding:0!important;
+  }
+
+  .print-footer{
+    font-size:5.5px!important;
+    line-height:1!important;
+    margin-top:2px!important;
+    padding-top:2px!important;
+  }
+
+  body.print-primary-only #reviewContent .secondary-print-page{
+    display:none!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="splashScreen" class="splash-screen" aria-hidden="true"><div class="splash-content"><div class="splash-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="13" y="9" width="38" height="48" rx="7" fill="#e7f0f8"/><rect x="21" y="5" width="22" height="10" rx="4" fill="#2f6fa5"/><path d="M22 27h20M22 36h20M22 45h13" stroke="#0f2742" stroke-width="4" stroke-linecap="round"/><path d="m40 45 4 4 8-10" fill="none" stroke="#16794b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>Client Information</h1><p>Secure client intake form</p></div></div>
@@ -967,7 +1108,7 @@
 
         <div class="card no-print"><h3>Save or send</h3><div class="action-grid">
           <div class="action-card"><h4>Print or save as PDF</h4><p>Opens the browser print dialog. Choose “Save as PDF” to create an email-ready copy.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
-          <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then send the completed Client Profile Sheet as a PDF. On iPhone and iPad, your device's Share Sheet opens so you can choose Mail or Outlook.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="" selected>Select an advisor</option><option value="braxton.oliver@raymondjames.com">Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button><p id="iosAdvisorHint" class="small hidden" style="margin-top:9px;color:var(--muted)">Selected advisor: <strong id="iosAdvisorHintText"></strong>. iPad/iPhone will attach the PDF through the Share Sheet; iOS controls the To field.</p></div>
+          <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then send the completed Client Profile Sheet as a PDF. On iPhone and iPad, your device's Share Sheet opens so you can choose Mail or Outlook.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="">Select an advisor</option><option value="braxton.oliver@raymondjames.com" selected>Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button><p id="iosAdvisorHint" class="small hidden" style="margin-top:9px;color:var(--muted)">Selected advisor: <strong id="iosAdvisorHintText"></strong>. iPad/iPhone will attach the PDF through the Share Sheet; iOS controls the To field.</p></div>
           
           
         </div></div>
@@ -1214,13 +1355,19 @@
     const personal=(owner,label)=>reviewSection(`${label} Personal Information`,rows(d,[['Name',`${owner}.firstName`],['Middle name',`${owner}.middleName`],['Last name',`${owner}.lastName`],['Goes by',`${owner}.preferred.name`],['Date of birth',`${owner}.dob`],['SSN / EIN',`${owner}.ssn`],['Marital status',`${owner}.maritalStatus`],['Email',`${owner}.email`],['Email type',`${owner}.emailType`],['Phone',`${owner}.phone`],['Phone type',`${owner}.phoneType`],['Physical address',`${owner}.physical.street`],['City',`${owner}.physical.city`],['State',`${owner}.physical.state`],['ZIP',`${owner}.physical.zip`]]));
     const employment=(owner,label)=>reviewSection(`${label} Employment Information`,rows(d,[['Employment status',`${owner}.employment.status`],['Employer / business',`${owner}.employment.employer`],['Job title',`${owner}.employment.jobTitle`],['Industry',`${owner}.employment.industry`],['Employment status date',`${owner}.employment.statusDate`],['Employer street',`${owner}.employment.address.street`],['Employer city',`${owner}.employment.address.city`],['Employer state',`${owner}.employment.address.state`],['Employer ZIP',`${owner}.employment.address.zip`]]));
     const financial=(owner,label)=>reviewSection(`${label} Financial Information`,rows(d,[['Income range',`${owner}.financial.incomeRange`],['Net worth',`${owner}.financial.netWorth`],['Liquid net worth',`${owner}.financial.liquidNetWorth`]])+`<div class="review-row"><b>Source of wealth</b><span>${esc((pathGet(d,owner+'.financial.sourceOfWealth')||[]).join(', ')||'—')}</span></div>`);
-    const primaryLeft=personal('primary','Primary')+employment('primary','Primary')+financial('primary','Primary');
-    let primaryRight=reviewSection('Account Profile & Trusted Contact',rows(d,[['Purpose','account.purpose'],['Time horizon','account.timeHorizon'],['Risk tolerance','account.riskTolerance'],['Trusted contact first name','trusted.firstName'],['Trusted contact last name','trusted.lastName'],['Trusted contact phone','trusted.phone'],['Trusted contact email','trusted.email']]));
-    primaryRight+=reviewSection('Primary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.primary||[]));
-    primaryRight+=reviewSection('Children or Grandchildren',d.children.length?'<ol class="review-list">'+d.children.map(x=>`<li>${esc(v(x.name))} — ${esc(v(x.relationship))}, DOB ${esc(v(x.dob))}, SSN ${esc(v(x.ssn))}</li>`).join('')+'</ol>':'—');
-    primaryRight+=reviewSection('Bank Information',rows(d,[['Bank name','bank.name'],['Routing number','bank.routing'],['Account number','bank.account'],['Day of month','bank.day'],['Starting date','bank.startDate'],['Amount','bank.amount']]));
-    let html=`<section class="print-client-page"><div class="print-page-title"><span>Primary Account Holder — ${esc(full(d.primary)||'Prospective Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns"><div>${primaryLeft}</div><div>${primaryRight}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;
-    if(d.meta.hasSecondary){const secondaryLeft=personal('secondary','Secondary')+employment('secondary','Secondary')+financial('secondary','Secondary');const secondaryRight=reviewSection('Secondary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.secondary||[]));html+=`<section class="print-client-page"><div class="print-page-title"><span>Secondary Account Holder — ${esc(full(d.secondary)||'Secondary Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns"><div>${secondaryLeft}</div><div>${secondaryRight}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;}
+    const primaryCol1=personal('primary','Primary');
+    const primaryCol2=employment('primary','Primary')+financial('primary','Primary');
+    let primaryCol3=reviewSection('Account Profile & Trusted Contact',rows(d,[['Purpose','account.purpose'],['Time horizon','account.timeHorizon'],['Risk tolerance','account.riskTolerance'],['Trusted contact first name','trusted.firstName'],['Trusted contact last name','trusted.lastName'],['Trusted contact phone','trusted.phone'],['Trusted contact email','trusted.email']]));
+    primaryCol3+=reviewSection('Primary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.primary||[]));
+    primaryCol3+=reviewSection('Children or Grandchildren',d.children.length?'<ol class="review-list">'+d.children.map(x=>`<li>${esc(v(x.name))} — ${esc(v(x.relationship))}, DOB ${esc(v(x.dob))}, SSN ${esc(v(x.ssn))}</li>`).join('')+'</ol>':'—');
+    primaryCol3+=reviewSection('Bank Information',rows(d,[['Bank name','bank.name'],['Routing number','bank.routing'],['Account number','bank.account'],['Day of month','bank.day'],['Starting date','bank.startDate'],['Amount','bank.amount']]));
+    let html=`<section class="print-client-page primary-print-page"><div class="print-page-title"><span>Primary Account Holder — ${esc(full(d.primary)||'Prospective Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns print-columns-three"><div>${primaryCol1}</div><div>${primaryCol2}</div><div>${primaryCol3}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;
+    if(d.meta.hasSecondary){
+      const secondaryCol1=personal('secondary','Secondary');
+      const secondaryCol2=employment('secondary','Secondary')+financial('secondary','Secondary');
+      const secondaryCol3=reviewSection('Secondary Account Holder Beneficiaries',beneficiaryReview(d.beneficiaries?.secondary||[]));
+      html+=`<section class="print-client-page secondary-print-page"><div class="print-page-title"><span>Secondary Account Holder — ${esc(full(d.secondary)||'Secondary Client')}</span><small>Prepared ${esc(prepared)}</small></div><div class="print-columns print-columns-three"><div>${secondaryCol1}</div><div>${secondaryCol2}</div><div>${secondaryCol3}</div></div><div class="print-footer">Confidential — Client Information Sheet</div></section>`;
+    }
     $('reviewContent').innerHTML=html;
   }
   function ordinal(n){const j=n%10,k=n%100;return n+(j===1&&k!==11?'st':j===2&&k!==12?'nd':j===3&&k!==13?'rd':'th')}
@@ -1327,7 +1474,8 @@
       ? advisorSelect.options[advisorSelect.selectedIndex].text.split(' — ')[0].trim()
       : 'Advisor';
     const d=serialize(),client=[d.primary?.firstName,d.primary?.lastName].filter(Boolean).join(' ')||'Client';
-    const subject=`Client Profile Sheet - ${client}`;
+    const clientLast=(d.primary?.lastName||'Client').trim()||'Client';
+    const subject=`${clientLast} Profile Sheet`;
     const body=`Hi ${advisorName}, please see my attached client profile sheet`;
 
     // iPhone / iPad: use the native Share Sheet so the generated PDF is
