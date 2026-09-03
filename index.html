@@ -967,7 +967,7 @@
 
         <div class="card no-print"><h3>Save or send</h3><div class="action-grid">
           <div class="action-card"><h4>Print or save as PDF</h4><p>Opens the browser print dialog. Choose “Save as PDF” to create an email-ready copy.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
-          <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then create an addressed email with the completed Client Profile Sheet attached as a PDF.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="" selected>Select an advisor</option><option value="braxton.oliver@raymondjames.com">Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button></div>
+          <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then send the completed Client Profile Sheet as a PDF. On iPhone and iPad, your device's Share Sheet opens so you can choose Mail or Outlook.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="" selected>Select an advisor</option><option value="braxton.oliver@raymondjames.com">Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button><p id="iosAdvisorHint" class="small hidden" style="margin-top:9px;color:var(--muted)">Selected advisor: <strong id="iosAdvisorHintText"></strong>. iPad/iPhone will attach the PDF through the Share Sheet; iOS controls the To field.</p></div>
           
           
         </div></div>
@@ -1330,8 +1330,35 @@
     const subject=`Client Profile Sheet - ${client}`;
     const body=`Hi ${advisorName}, please see my attached client profile sheet`;
 
+    // iPhone / iPad: use the native Share Sheet so the generated PDF is
+    // handed directly to Mail, Outlook, or another installed mail app.
+    // iOS controls the recipient field when sharing a file, so the selected
+    // advisor address is shown in the app as a reference but cannot be forced
+    // into the To field through Safari's Web Share API.
+    const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)
+      || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+
+    if(isiOS && navigator.share){
+      const file=new File([blob],filename,{type:'application/pdf'});
+      const shareData={title:subject,text:body,files:[file]};
+
+      if(!navigator.canShare || navigator.canShare({files:[file]})){
+        try{
+          await navigator.share(shareData);
+          return;
+        }catch(err){
+          if(err?.name==='AbortError') return;
+          console.warn('Native share failed, falling back to PDF download.',err);
+        }
+      }
+
+      // Fallback if this browser cannot share files directly.
+      downloadBlob(filename,blob);
+      alert(`The PDF was downloaded. Send it to ${advisorName} at ${email}.`);
+      return;
+    }
+
     // Desktop: create a standards-based .eml with To, body, and PDF attachment.
-    // This is the only browser-only method that can reliably package all three together.
     const b64=await blobToBase64(blob),boundary='----ClientProfileBoundary'+Date.now();
     const eml=[
       `To: ${email}`,
@@ -1355,11 +1382,7 @@
       `--${boundary}--`
     ].join('\r\n');
 
-    // On Apple/mobile devices, the native share sheet can attach the PDF, but web
-    // browsers cannot force the recipient field into Mail/Outlook through share().
-    // Prefer .eml so To/body/attachment remain packaged together consistently.
     downloadBlob(fileBase()+'_Client_Profile_Email.eml',new Blob([eml],{type:'message/rfc822'}));
-    alert('Your addressed email is ready. Open the downloaded email file to send it with the PDF attached.');
   }
   function downloadBlob(filename,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
   function download(filename,text,type='application/json'){const blob=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
@@ -1941,6 +1964,30 @@
       alert('Test Mode filled a complete sample profile, including a secondary client, beneficiaries, children, banking, goals, and advisor selection. You can now move through every page and test Print / Email.');
     },120);
   });
+})();
+</script>
+
+
+<script id="iosEmailShareHintV17">
+(() => {
+  const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)
+    || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const select=document.getElementById('advisorEmail');
+  const hint=document.getElementById('iosAdvisorHint');
+  const hintText=document.getElementById('iosAdvisorHintText');
+  if(!isiOS || !select || !hint || !hintText) return;
+
+  function sync(){
+    if(select.selectedIndex>0){
+      const option=select.options[select.selectedIndex];
+      hintText.textContent=option.text;
+      hint.classList.remove('hidden');
+    }else{
+      hint.classList.add('hidden');
+    }
+  }
+  select.addEventListener('change',sync);
+  sync();
 })();
 </script>
 

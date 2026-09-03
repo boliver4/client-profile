@@ -1,5 +1,15 @@
-# Client Information Sheet
+# Client Information Sheet — v17 Test Mode
 
-Upload the contents of this folder to the root of your GitHub repository.
+Deployable GitHub/Vercel package.
 
-index.html is the complete single-file app, including the temporary Test Mode and embedded iPhone/iPad home-screen icon.
+Files:
+- index.html — complete single-file application
+- vercel.json — static deployment/no-cache headers
+- README.md — deployment notes
+
+The iPhone/iPad home-screen icon is embedded directly in index.html.
+
+This version still includes the temporary TEST: Fill Random Data button.
+
+GitHub:
+Upload index.html, vercel.json, and README.md to the ROOT of the repository.
