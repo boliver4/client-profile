@@ -989,7 +989,7 @@
             <div class="col-4"><label class="req">Goes by another name?</label><select name="primary.preferred.use" required data-preferred-toggle="primary"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>
             <div class="col-8 hidden" id="primaryPreferredNameField"><label class="req">Name client goes by</label><input name="primary.preferred.name" autocomplete="nickname"></div>
             <div class="col-12 identity-row">
-              <div class="identity-field dob-field"><label class="req">Date of birth</label><input type="date" name="primary.dob" required></div>
+              <div class="identity-field dob-field"><label class="req">Date of birth</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date name="primary.dob" required></div>
               <div class="identity-field ssn-field"><label class="req">SSN or EIN</label><input name="primary.ssn" required inputmode="numeric" autocomplete="off" placeholder="XXX-XX-XXXX" maxlength="11"></div>
               <div class="identity-field marital-field"><label class="req">Marital status</label><select name="primary.maritalStatus" required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
             </div>
@@ -1026,7 +1026,7 @@
             <div class="col-4" data-role="employer-name"><label class="req" data-label>Employer name</label><input name="primary.employment.employer" autocomplete="organization"></div>
             <div class="col-4" data-role="job-title"><label class="req">Job title</label><input name="primary.employment.jobTitle"></div>
             <div class="col-4" data-role="industry"><label class="req">Industry</label><input name="primary.employment.industry" placeholder="e.g., Education, Healthcare"></div>
-            <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="date" name="primary.employment.statusDate"></div>
+            <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date name="primary.employment.statusDate"></div>
             <div class="col-12"><label class="req" data-address-label>Employer Address</label><input name="primary.employment.street" autocomplete="off"></div>
             <div class="col-6"><label class="req">Employer city</label><input name="primary.employment.city"></div><div class="col-3"><label class="req">Employer state</label><input name="primary.employment.state" maxlength="2"></div><div class="col-3"><label class="req">Employer ZIP</label><input name="primary.employment.zip"></div>
           </div></div>
@@ -1047,7 +1047,7 @@
         <div id="secondaryFields" class="hidden">
           <div class="card"><h3>Secondary client personal information</h3><div class="grid">
             <div class="col-4"><label class="req">First name</label><input name="secondary.firstName" data-secondary-required></div><div class="col-4"><label>Middle name <span style="font-weight:500;color:var(--muted)">(optional)</span></label><input name="secondary.middleName"></div><div class="col-4"><label class="req">Last name</label><input name="secondary.lastName" data-secondary-required></div><div class="col-4"><label class="req">Goes by another name?</label><select name="secondary.preferred.use" data-secondary-required data-preferred-toggle="secondary"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div><div class="col-8 hidden" id="secondaryPreferredNameField"><label class="req">Name client goes by</label><input name="secondary.preferred.name"></div>
-            <div class="col-12 identity-row"><div class="identity-field dob-field"><label class="req">Date of birth</label><input type="date" name="secondary.dob" data-secondary-required></div><div class="identity-field ssn-field"><label class="req">SSN or EIN</label><input name="secondary.ssn" data-secondary-required autocomplete="off" inputmode="numeric" placeholder="XXX-XX-XXXX" maxlength="11"></div><div class="identity-field marital-field"><label class="req">Marital status</label><select name="secondary.maritalStatus" data-secondary-required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div></div>
+            <div class="col-12 identity-row"><div class="identity-field dob-field"><label class="req">Date of birth</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date name="secondary.dob" data-secondary-required></div><div class="identity-field ssn-field"><label class="req">SSN or EIN</label><input name="secondary.ssn" data-secondary-required autocomplete="off" inputmode="numeric" placeholder="XXX-XX-XXXX" maxlength="11"></div><div class="identity-field marital-field"><label class="req">Marital status</label><select name="secondary.maritalStatus" data-secondary-required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div></div>
             <div class="col-12 contact-row"><div class="contact-type"><label class="req">Email type</label><select name="secondary.emailType" data-secondary-required><option selected>Personal</option><option>Work</option></select></div><div class="contact-input"><label class="req">Email address</label><input type="email" name="secondary.email" data-secondary-required autocomplete="email"></div><div class="contact-type"><label class="req">Phone type</label><select name="secondary.phoneType" data-secondary-required><option selected>Cell</option><option>Home</option><option>Work</option></select></div><div class="contact-input"><label class="req">Phone number</label><input type="tel" name="secondary.phone" data-secondary-required autocomplete="tel" inputmode="tel" placeholder="(325) 555-1234" data-phone></div></div>
           </div></div>
           <div class="card"><h3>Physical address</h3><p class="card-sub">If the primary client is married, the home address and marital status are copied automatically and can still be edited.</p><div class="grid">
@@ -1065,7 +1065,7 @@
               <div class="col-4" data-role="employer-name"><label class="req" data-label>Employer name</label><input name="secondary.employment.employer" autocomplete="organization"></div>
               <div class="col-4" data-role="job-title"><label class="req">Job title</label><input name="secondary.employment.jobTitle"></div>
               <div class="col-4" data-role="industry"><label class="req">Industry</label><input name="secondary.employment.industry"></div>
-              <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="date" name="secondary.employment.statusDate"></div>
+              <div class="col-4 hidden" data-role="status-date"><label class="req" data-label>Date retired</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date name="secondary.employment.statusDate"></div>
               <div class="col-12"><label class="req" data-address-label>Employer Address</label><input name="secondary.employment.street" autocomplete="off"></div>
               <div class="col-6"><label class="req">Employer city</label><input name="secondary.employment.city"></div><div class="col-3"><label class="req">Employer state</label><input name="secondary.employment.state" maxlength="2"></div><div class="col-3"><label class="req">Employer ZIP</label><input name="secondary.employment.zip"></div>
             </div></div>
@@ -1108,7 +1108,7 @@
       <section class="step" data-step="7">
         <div class="step-head"><div><h2>Bank information</h2><p>Used for sending or receiving funds from the account.</p></div><span class="step-num">Step 8 of 9</span></div>
         <div class="notice warning no-print">This section contains highly sensitive information. The draft remains only in this browser unless the user exports or emails it. Avoid using a shared or public device.</div>
-        <div class="card" style="margin-top:18px"><h3>Banking details</h3><div class="grid"><div class="col-6"><label>Bank name</label><input name="bank.name" autocomplete="off"></div><div class="col-6"><label>Routing number</label><input name="bank.routing" inputmode="numeric" autocomplete="off"></div><div class="col-6"><label>Account number</label><input name="bank.account" autocomplete="off"></div><div class="col-3"><label>Day of month</label><select name="bank.day" id="bankDay"><option value="">Select</option></select></div><div class="col-3"><label>Starting date</label><input type="date" name="bank.startDate"></div><div class="col-6"><label>Dollar amount</label><input type="text" inputmode="decimal" name="bank.amount" placeholder="$0.00" data-currency></div></div></div>
+        <div class="card" style="margin-top:18px"><h3>Banking details</h3><div class="grid"><div class="col-6"><label>Bank name</label><input name="bank.name" autocomplete="off"></div><div class="col-6"><label>Routing number</label><input name="bank.routing" inputmode="numeric" autocomplete="off"></div><div class="col-6"><label>Account number</label><input name="bank.account" autocomplete="off"></div><div class="col-3"><label>Day of month</label><select name="bank.day" id="bankDay"><option value="">Select</option></select></div><div class="col-3"><label>Starting date</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date name="bank.startDate"></div><div class="col-6"><label>Dollar amount</label><input type="text" inputmode="decimal" name="bank.amount" placeholder="$0.00" data-currency></div></div></div>
       </section>
 
       <section class="step" id="step-review" data-step="8">
@@ -1138,7 +1138,7 @@
 </div>
 
 <template id="beneficiaryTemplate"><div class="repeat-item"><button type="button" class="remove">Remove</button><p class="repeat-title">Beneficiary <span class="item-number"></span></p><div class="grid"><div class="col-4"><label>Name</label><input data-field="name"></div><div class="col-3"><label>Relationship</label><select data-field="relationship"><option value="">Select</option><option>Spouse</option><option>Non-Spouse</option></select></div><div class="col-3"><label>Type</label><select data-field="type"><option value="">Select</option><option>Primary</option><option>Contingent</option></select></div><div class="col-2"><label>Percentage</label><input type="number" min="0.01" max="100" step=".01" data-field="percentage"></div></div></div></template>
-<template id="childTemplate"><div class="repeat-item"><button type="button" class="remove">Remove</button><p class="repeat-title">Child / Grandchild <span class="item-number"></span></p><div class="grid"><div class="col-4"><label>Name</label><input data-field="name"></div><div class="col-3"><label>Relationship</label><input data-field="relationship"></div><div class="col-3"><label>Date of birth</label><input type="date" data-field="dob"></div><div class="col-2"><label>SSN</label><input data-field="ssn" autocomplete="off"></div></div></div></template>
+<template id="childTemplate"><div class="repeat-item"><button type="button" class="remove">Remove</button><p class="repeat-title">Child / Grandchild <span class="item-number"></span></p><div class="grid"><div class="col-4"><label>Name</label><input data-field="name"></div><div class="col-3"><label>Relationship</label><input data-field="relationship"></div><div class="col-3"><label>Date of birth</label><input type="text" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off" data-date data-field="dob"></div><div class="col-2"><label>SSN</label><input data-field="ssn" autocomplete="off"></div></div></div></template>
 
 <script>
 (() => {
@@ -1168,6 +1168,12 @@
   const digits=value=>String(value||'').replace(/\D/g,'');
   function formatSSN(value){const d=digits(value).slice(0,9);return d.length<=3?d:d.length<=5?`${d.slice(0,3)}-${d.slice(3)}`:`${d.slice(0,3)}-${d.slice(3,5)}-${d.slice(5)}`}
   function formatPhone(value){const d=digits(value).slice(0,10);if(d.length<4)return d;if(d.length<7)return `(${d.slice(0,3)}) ${d.slice(3)}`;return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`}
+  const toMDY=v=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v||''));return m?`${m[2]}/${m[3]}/${m[1]}`:(v??'')};
+  function formatDateTyping(value){const d=digits(value).slice(0,8);if(d.length<3)return d;if(d.length<5)return `${d.slice(0,2)}/${d.slice(2)}`;return `${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`}
+  function validDate(v){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);if(!m)return false;const mo=+m[1],da=+m[2],yr=+m[3];if(mo<1||mo>12||yr<1900||yr>2100)return false;return da>=1&&da<=new Date(yr,mo,0).getDate()}
+  function checkDate(el){const v=el.value.trim();el.setCustomValidity(v&&!validDate(v)?'Enter a real date as MM/DD/YYYY.':'')}
+  document.addEventListener('input',e=>{const el=e.target;if(!el?.matches?.('[data-date]'))return;const deleting=e.inputType&&e.inputType.startsWith('delete');if(!deleting)el.value=formatDateTyping(el.value);el.setCustomValidity('')},true);
+  document.addEventListener('blur',e=>{const el=e.target;if(el?.matches?.('[data-date]'))checkDate(el)},true);
   function setupMasks(){document.querySelectorAll('input[name$=".ssn"], input[data-field="ssn"]').forEach(el=>{el.inputMode='numeric';el.placeholder='XXX-XX-XXXX';el.addEventListener('input',()=>el.value=formatSSN(el.value))});document.querySelectorAll('[data-phone]').forEach(el=>el.addEventListener('input',()=>el.value=formatPhone(el.value)))}
   const employmentFields=prefix=>['employer','jobTitle','industry','statusDate','street','city','state','zip'].map(k=>form.querySelector(`[name="${prefix}.employment.${k}"]`));
   function updateEmployment(client){
@@ -1327,14 +1333,14 @@
   function scheduleSave(){setSaveState('Saving…','busy');clearTimeout(saveTimer);saveTimer=setTimeout(save,350)}
   function addRepeat(type,data={},owner='primary'){
     const tpl=$(type+'Template').content.cloneNode(true); const container=$(type==='beneficiary'?owner+'Beneficiaries':'children'); const item=tpl.querySelector('.repeat-item');
-    item.dataset.owner=owner; item.querySelectorAll('[data-field]').forEach(el=>el.value=data[el.dataset.field]??'');
+    item.dataset.owner=owner; item.querySelectorAll('[data-field]').forEach(el=>el.value=('date' in el.dataset)?toMDY(data[el.dataset.field]??''):(data[el.dataset.field]??''));
     item.querySelector('.remove').onclick=()=>{item.remove();renumber();beneficiaryTotals(owner);scheduleSave()};
     container.appendChild(tpl);renumber();item.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>beneficiaryTotals(owner)));beneficiaryTotals(owner);
   }
   function renumber(){['primary','secondary'].forEach(owner=>document.querySelectorAll(`#${owner}Beneficiaries .item-number`).forEach((x,i)=>x.textContent=i+1));document.querySelectorAll('#children .item-number').forEach((x,i)=>x.textContent=i+1)}
   function hydrate(data){
     if(!data)return;
-    form.querySelectorAll('[name]').forEach(el=>{const v=pathGet(data,el.name);if(v!==undefined)el.type==='checkbox'?el.checked=!!v:el.value=v});
+    form.querySelectorAll('[name]').forEach(el=>{const v=pathGet(data,el.name);if(v!==undefined)el.type==='checkbox'?el.checked=!!v:el.value=('date' in el.dataset)?toMDY(v):v});
     document.querySelectorAll('[data-check-group]').forEach(group=>{const vals=pathGet(data,group.dataset.checkGroup)||[];group.querySelectorAll('input').forEach(x=>x.checked=vals.includes(x.value))});
     $('mailingToggle').checked=!!data.meta?.hasMailing; toggleMailing(); $('secondaryToggle').checked=!!data.meta?.hasSecondary; toggleSecondary();
     ['primary','secondary'].forEach(owner=>{$(owner+'Beneficiaries').innerHTML='';const list=Array.isArray(data.beneficiaries)?(owner==='primary'?data.beneficiaries:[]):(data.beneficiaries?.[owner]||[]);list.forEach(x=>addRepeat('beneficiary',x,owner));if(!list.length)addRepeat('beneficiary',{},owner)})
@@ -1357,7 +1363,7 @@
   function updatePreferred(owner){const select=form.querySelector(`[name="${owner}.preferred.use"]`);const field=$(owner+'PreferredNameField');const input=form.querySelector(`[name="${owner}.preferred.name"]`);const show=select?.value==='Yes'&&(owner==='primary'||$('secondaryToggle').checked);field?.classList.toggle('hidden',!show);if(input)input.required=!!show;}
   function toggleSecondary(){const on=$('secondaryToggle').checked;$('secondaryFields').classList.toggle('hidden',!on);$('secondaryBeneficiaryCard').classList.toggle('hidden',!on);document.querySelectorAll('[data-secondary-required]').forEach(el=>el.required=on);updateEmployment('secondary');updatePreferred('secondary');syncMarriedSecondary();syncSpouseBeneficiaries()}
   function showStep(n){current=Math.max(0,Math.min(steps.length-1,n));steps.forEach((s,i)=>s.classList.toggle('active',i===current));$('progressBar').style.width=((current+1)/steps.length*100)+'%';$('prevBtn').style.visibility=current===0?'hidden':'visible';$('nextBtn').textContent=current===steps.length-1?'Back to Start':'Next';$('navLabel').textContent=labels[current];$('validationMsg').style.display='none';if(current===steps.length-1)renderReview();window.scrollTo({top:0,behavior:'smooth'})}
-  function validateCurrent(){const active=steps[current];let ok=true;if(current===5&&!validateBeneficiaries())return false;active.querySelectorAll('[required]').forEach(el=>{if(!el.value){ok=false;el.reportValidity()}});if(active.querySelector('[data-trusted-methods]')&&!form.querySelector('[name="trusted.usePhone"]').checked&&!form.querySelector('[name="trusted.useEmail"]').checked){ok=false;alert('Select phone, email, or both for the trusted contact.')} $('validationMsg').style.display=ok?'none':'block';return ok}
+  function validateCurrent(){const active=steps[current];let ok=true;if(current===5&&!validateBeneficiaries())return false;active.querySelectorAll('[required]').forEach(el=>{if(!el.value){ok=false;el.reportValidity()}});active.querySelectorAll('[data-date]').forEach(el=>{if(!el.offsetParent)return;checkDate(el);if(!el.checkValidity()){ok=false;el.reportValidity()}});if(active.querySelector('[data-trusted-methods]')&&!form.querySelector('[name="trusted.usePhone"]').checked&&!form.querySelector('[name="trusted.useEmail"]').checked){ok=false;alert('Select phone, email, or both for the trusted contact.')} $('validationMsg').style.display=ok?'none':'block';return ok}
   const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const v=x=>x||'—';
   function rows(obj,pairs){return '<div class="review-grid">'+pairs.map(([label,path])=>`<div class="review-row"><b>${label}</b><span>${esc(v(pathGet(obj,path)))}</span></div>`).join('')+'</div>'}
@@ -1446,7 +1452,7 @@
     const d=serialize();
     const WIN={'\u2014':'\\227','\u2013':'\\226','\u2018':'\\221','\u2019':'\\222','\u201C':'\\223','\u201D':'\\224','\u2022':'\\225','\u00A0':' '};const escPdf=t=>String(t??'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7E]/g,c=>WIN[c]||(c.charCodeAt(0)>=160&&c.charCodeAt(0)<=255?'\\'+c.charCodeAt(0).toString(8):' '));
     const clean=t=>String(t??'').trim();
-    const formatDate=value=>{if(!value)return '';const p=String(value).split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0]}`:String(value)};
+    const formatDate=value=>{if(!value)return '';value=toMDY(value);const p=String(value).split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0]}`:String(value)};
     const address=o=>[o?.street,o?.city,o?.state,o?.zip].filter(Boolean).join(', ');
     const full=o=>[o?.firstName,o?.middleName,o?.lastName].filter(Boolean).join(' ');
     const advisorSelect=document.getElementById('advisorEmail');
