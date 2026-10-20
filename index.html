@@ -724,9 +724,9 @@
   body{font-size:8.5px!important}
   #reviewContent{display:block!important}
   #reviewContent .print-client-page{
-    height:10in!important;
-    max-height:10in!important;
-    overflow:hidden!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
     page-break-after:always!important;
     break-after:page!important;
   }
@@ -823,8 +823,8 @@
 
   #reviewContent .print-client-page{
     width:100%!important;
-    height:10.48in!important;
-    max-height:10.48in!important;
+    height:auto!important;
+    max-height:none!important;
     min-height:0!important;
     box-sizing:border-box!important;
     overflow:hidden!important;
@@ -932,6 +932,17 @@
   body.print-primary-only #reviewContent .secondary-print-page{
     display:none!important;
   }
+}
+</style>
+
+<style id="printCleanupV21">
+@media print{
+  #step-review > .card{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;background:none!important}
+  #reviewContent .print-client-page,
+  #reviewContent .print-client-page:last-child{page-break-after:auto!important;break-after:auto!important}
+  #reviewContent .print-client-page + .print-client-page{page-break-before:always!important;break-before:page!important}
+  .app{min-height:0!important;padding:0!important}
+  .validation,.bottom-nav,#savedDraftBanner{display:none!important}
 }
 </style>
 
@@ -1107,7 +1118,7 @@
         </div>
 
         <div class="card no-print"><h3>Save or send</h3><div class="action-grid">
-          <div class="action-card"><h4>Print or save as PDF</h4><p>Opens the browser print dialog. Choose “Save as PDF” to create an email-ready copy.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
+          <div class="action-card"><h4>Print or save as PDF</h4><p>Creates the Client Profile Sheet as a PDF. Print it or save it from there. On iPhone and iPad, choose Print or Save to Files from the Share Sheet.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
           <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then send the completed Client Profile Sheet as a PDF. On iPhone and iPad, your device's Share Sheet opens so you can choose Mail or Outlook.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="">Select an advisor</option><option value="braxton.oliver@raymondjames.com" selected>Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button><p id="iosAdvisorHint" class="small hidden" style="margin-top:9px;color:var(--muted)">Selected advisor: <strong id="iosAdvisorHintText"></strong>. iPad/iPhone will attach the PDF through the Share Sheet; iOS controls the To field.</p></div>
           
           
@@ -1349,12 +1360,13 @@
   function rows(obj,pairs){return '<div class="review-grid">'+pairs.map(([label,path])=>`<div class="review-row"><b>${label}</b><span>${esc(v(pathGet(obj,path)))}</span></div>`).join('')+'</div>'}
   function reviewSection(title,content){return `<div class="review-section"><h3>${esc(title)}</h3>${content}</div>`}
   function beneficiaryReview(list){return list.length?'<ol class="review-list">'+list.map(x=>`<li>${esc(v(x.name))} — ${esc(v(x.relationship))}, ${esc(v(x.type))}, ${esc(v(x.percentage))}%</li>`).join('')+'</ol>':'—'}
+  const wealthText=f=>{const list=[...(f?.sourceOfWealth||[])];const other=String(f?.otherSource||'').trim();if(other){const i=list.indexOf('Other');if(i>=0)list[i]=`Other (${other})`;else list.push(`Other (${other})`)}return list.join(', ')};
   function renderReview(){
     const d=serialize(), prepared=new Date().toLocaleDateString('en-US');
     const full=o=>[o?.firstName,o?.middleName,o?.lastName].filter(Boolean).join(' ');
-    const personal=(owner,label)=>reviewSection(`${label} Personal Information`,rows(d,[['Name',`${owner}.firstName`],['Middle name',`${owner}.middleName`],['Last name',`${owner}.lastName`],['Goes by',`${owner}.preferred.name`],['Date of birth',`${owner}.dob`],['SSN / EIN',`${owner}.ssn`],['Marital status',`${owner}.maritalStatus`],['Email',`${owner}.email`],['Email type',`${owner}.emailType`],['Phone',`${owner}.phone`],['Phone type',`${owner}.phoneType`],['Physical address',`${owner}.physical.street`],['City',`${owner}.physical.city`],['State',`${owner}.physical.state`],['ZIP',`${owner}.physical.zip`]]));
-    const employment=(owner,label)=>reviewSection(`${label} Employment Information`,rows(d,[['Employment status',`${owner}.employment.status`],['Employer / business',`${owner}.employment.employer`],['Job title',`${owner}.employment.jobTitle`],['Industry',`${owner}.employment.industry`],['Employment status date',`${owner}.employment.statusDate`],['Employer street',`${owner}.employment.address.street`],['Employer city',`${owner}.employment.address.city`],['Employer state',`${owner}.employment.address.state`],['Employer ZIP',`${owner}.employment.address.zip`]]));
-    const financial=(owner,label)=>reviewSection(`${label} Financial Information`,rows(d,[['Income range',`${owner}.financial.incomeRange`],['Net worth',`${owner}.financial.netWorth`],['Liquid net worth',`${owner}.financial.liquidNetWorth`]])+`<div class="review-row"><b>Source of wealth</b><span>${esc((pathGet(d,owner+'.financial.sourceOfWealth')||[]).join(', ')||'—')}</span></div>`);
+    const personal=(owner,label)=>reviewSection(`${label} Personal Information`,rows(d,[['Name',`${owner}.firstName`],['Middle name',`${owner}.middleName`],['Last name',`${owner}.lastName`],['Goes by',`${owner}.preferred.name`],['Date of birth',`${owner}.dob`],['SSN / EIN',`${owner}.ssn`],['Marital status',`${owner}.maritalStatus`],['Email',`${owner}.email`],['Email type',`${owner}.emailType`],['Phone',`${owner}.phone`],['Phone type',`${owner}.phoneType`],['Physical address',`${owner}.physical.street`],['City',`${owner}.physical.city`],['State',`${owner}.physical.state`],['ZIP',`${owner}.physical.zip`]].concat(owner==='primary'&&d.meta?.hasMailing?[['Mailing address',`${owner}.mailing.street`],['Mailing city',`${owner}.mailing.city`],['Mailing state',`${owner}.mailing.state`],['Mailing ZIP',`${owner}.mailing.zip`]]:[])));
+    const employment=(owner,label)=>reviewSection(`${label} Employment Information`,rows(d,[['Employment status',`${owner}.employment.status`],['Employer / business',`${owner}.employment.employer`],['Job title',`${owner}.employment.jobTitle`],['Industry',`${owner}.employment.industry`],['Employment status date',`${owner}.employment.statusDate`],['Employer street',`${owner}.employment.street`],['Employer city',`${owner}.employment.city`],['Employer state',`${owner}.employment.state`],['Employer ZIP',`${owner}.employment.zip`]]));
+    const financial=(owner,label)=>reviewSection(`${label} Financial Information`,rows(d,[['Income range',`${owner}.financial.incomeRange`],['Net worth',`${owner}.financial.netWorth`],['Liquid net worth',`${owner}.financial.liquidNetWorth`]])+`<div class="review-row"><b>Source of wealth</b><span>${esc(wealthText(pathGet(d,owner+'.financial'))||'—')}</span></div>`);
     const primaryCol1=personal('primary','Primary');
     const primaryCol2=employment('primary','Primary')+financial('primary','Primary');
     let primaryCol3=reviewSection('Account Profile & Trusted Contact',rows(d,[['Purpose','account.purpose'],['Time horizon','account.timeHorizon'],['Risk tolerance','account.riskTolerance'],['Trusted contact first name','trusted.firstName'],['Trusted contact last name','trusted.lastName'],['Trusted contact phone','trusted.phone'],['Trusted contact email','trusted.email']]));
@@ -1377,6 +1389,7 @@
   function fullName(prefix){return [form.querySelector(`[name="${prefix}.firstName"]`)?.value,form.querySelector(`[name="${prefix}.middleName"]`)?.value,form.querySelector(`[name="${prefix}.lastName"]`)?.value].filter(Boolean).join(' ').trim()}
   function syncMarriedSecondary(){if(!$('secondaryToggle').checked||form.querySelector('[name="primary.maritalStatus"]')?.value!=='Married')return;form.querySelector('[name="secondary.maritalStatus"]').value='Married';['street','city','state','zip'].forEach(k=>{const src=form.querySelector(`[name="primary.physical.${k}"]`),dst=form.querySelector(`[name="secondary.physical.${k}"]`);if(src&&dst)dst.value=src.value})}
   function syncSpouseBeneficiaries(){if(!$('secondaryToggle').checked)return;const married=form.querySelector('[name="primary.maritalStatus"]')?.value==='Married';const texas=(form.querySelector('[name="primary.physical.state"]')?.value||'').trim().toUpperCase()==='TX';if(!(married&&texas))return;[['primary','secondary'],['secondary','primary']].forEach(([owner,spouse])=>{const spouseName=fullName(spouse);if(!spouseName)return;const container=$(owner+'Beneficiaries');let items=[...container.querySelectorAll('.repeat-item')];let target=items.find(i=>i.querySelector('[data-field="type"]')?.value==='Primary');if(!target){addRepeat('beneficiary',{type:'Primary',percentage:'100'},owner);target=[...container.querySelectorAll('.repeat-item')].at(-1)}target.querySelector('[data-field="name"]').value=spouseName;target.querySelector('[data-field="relationship"]').value='Spouse';target.querySelector('[data-field="type"]').value='Primary';target.querySelector('[data-field="percentage"]').value='100';items.filter(i=>i!==target&&i.querySelector('[data-field="type"]')?.value==='Primary').forEach(i=>i.querySelector('[data-field="type"]').value='Contingent');beneficiaryTotals(owner)})}
+  const empAddress=e=>[e?.street||e?.address?.street,e?.city||e?.address?.city,e?.state||e?.address?.state,e?.zip||e?.address?.zip].filter(Boolean).join(', ');
   function pdfSections(){
     const d=serialize(), sections=[];
     const address=o=>[o?.street,o?.city,o?.state,o?.zip].filter(Boolean).join(', ');
@@ -1389,11 +1402,11 @@
     ]);
     add('Primary Employment Information',[
       ['Employment Status',d.primary?.employment?.status],['Employer / Business',d.primary?.employment?.employer],['Job Title',d.primary?.employment?.jobTitle],
-      ['Industry',d.primary?.employment?.industry],['Status Date',d.primary?.employment?.statusDate],['Employer Address',address(d.primary?.employment?.address)]
+      ['Industry',d.primary?.employment?.industry],['Status Date',d.primary?.employment?.statusDate],['Employer Address',empAddress(d.primary?.employment)]
     ]);
     add('Primary Financial Information',[
       ['Income Range',d.primary?.financial?.incomeRange],['Net Worth',d.primary?.financial?.netWorth],['Liquid Net Worth',d.primary?.financial?.liquidNetWorth],
-      ['Source of Wealth',(d.primary?.financial?.sourceOfWealth||[]).join(', ')]
+      ['Source of Wealth',wealthText(d.primary?.financial)]
     ]);
     if(d.meta?.hasSecondary){
       add('Secondary Client',[
@@ -1403,11 +1416,11 @@
       ]);
       add('Secondary Employment Information',[
         ['Employment Status',d.secondary?.employment?.status],['Employer / Business',d.secondary?.employment?.employer],['Job Title',d.secondary?.employment?.jobTitle],
-        ['Industry',d.secondary?.employment?.industry],['Status Date',d.secondary?.employment?.statusDate],['Employer Address',address(d.secondary?.employment?.address)]
+        ['Industry',d.secondary?.employment?.industry],['Status Date',d.secondary?.employment?.statusDate],['Employer Address',empAddress(d.secondary?.employment)]
       ]);
       add('Secondary Financial Information',[
         ['Income Range',d.secondary?.financial?.incomeRange],['Net Worth',d.secondary?.financial?.netWorth],['Liquid Net Worth',d.secondary?.financial?.liquidNetWorth],
-        ['Source of Wealth',(d.secondary?.financial?.sourceOfWealth||[]).join(', ')]
+        ['Source of Wealth',wealthText(d.secondary?.financial)]
       ]);
     }
     add('Account Profile & Trusted Contact',[
@@ -1428,7 +1441,7 @@
   }
   function makePdfBlob(){
     const d=serialize();
-    const escPdf=t=>String(t??'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7E]/g,' ');
+    const WIN={'\u2014':'\\227','\u2013':'\\226','\u2018':'\\221','\u2019':'\\222','\u201C':'\\223','\u201D':'\\224','\u2022':'\\225','\u00A0':' '};const escPdf=t=>String(t??'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^\x20-\x7E]/g,c=>WIN[c]||(c.charCodeAt(0)>=160&&c.charCodeAt(0)<=255?'\\'+c.charCodeAt(0).toString(8):' '));
     const clean=t=>String(t??'').trim();
     const formatDate=value=>{if(!value)return '';const p=String(value).split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0]}`:String(value)};
     const address=o=>[o?.street,o?.city,o?.state,o?.zip].filter(Boolean).join(', ');
@@ -1439,8 +1452,8 @@
     const pageSpec=[];
     pageSpec.push({name:`Primary Account Holder — ${full(d.primary)||'Prospective Client'}`,left:[
       {title:'Personal Information',rows:[['Name',full(d.primary)],['Date of Birth',formatDate(d.primary?.dob)],['SSN / EIN',d.primary?.ssn],['Marital Status',d.primary?.maritalStatus],['Email',`${d.primary?.emailType||''}${d.primary?.emailType?' — ':''}${d.primary?.email||''}`],['Phone',`${d.primary?.phoneType||''}${d.primary?.phoneType?' — ':''}${d.primary?.phone||''}`],['Physical Address',address(d.primary?.physical)],['Mailing Address',d.meta?.hasMailing?address(d.primary?.mailing):'Same as physical address']]},
-      {title:'Employment Information',rows:[['Employment Status',d.primary?.employment?.status],['Employer / Business',d.primary?.employment?.employer],['Job Title',d.primary?.employment?.jobTitle],['Industry',d.primary?.employment?.industry],['Status Date',formatDate(d.primary?.employment?.statusDate)],['Employer Address',address(d.primary?.employment?.address)]]},
-      {title:'Financial Information',rows:[['Income Range',d.primary?.financial?.incomeRange],['Net Worth',d.primary?.financial?.netWorth],['Liquid Net Worth',d.primary?.financial?.liquidNetWorth],['Source of Wealth',(d.primary?.financial?.sourceOfWealth||[]).join(', ')]]}
+      {title:'Employment Information',rows:[['Employment Status',d.primary?.employment?.status],['Employer / Business',d.primary?.employment?.employer],['Job Title',d.primary?.employment?.jobTitle],['Industry',d.primary?.employment?.industry],['Status Date',formatDate(d.primary?.employment?.statusDate)],['Employer Address',empAddress(d.primary?.employment)]]},
+      {title:'Financial Information',rows:[['Income Range',d.primary?.financial?.incomeRange],['Net Worth',d.primary?.financial?.netWorth],['Liquid Net Worth',d.primary?.financial?.liquidNetWorth],['Source of Wealth',wealthText(d.primary?.financial)]]}
     ],right:[
       {title:'Account Profile & Trusted Contact',rows:[['Account Purpose',d.account?.purpose],['Time Horizon',d.account?.timeHorizon],['Risk Tolerance',d.account?.riskTolerance],['Trusted Contact',full(d.trusted)],['Trusted Phone',d.trusted?.phone],['Trusted Email',d.trusted?.email]]},
       {title:'Primary Beneficiaries',rows:(d.beneficiaries?.primary||[]).map((x,i)=>[`Beneficiary ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | ${x.type||'—'} | ${x.percentage||'—'}%`])},
@@ -1449,8 +1462,8 @@
     ]});
     if(d.meta?.hasSecondary){pageSpec.push({name:`Secondary Account Holder — ${full(d.secondary)||'Secondary Client'}`,left:[
       {title:'Personal Information',rows:[['Name',full(d.secondary)],['Date of Birth',formatDate(d.secondary?.dob)],['SSN / EIN',d.secondary?.ssn],['Marital Status',d.secondary?.maritalStatus],['Email',`${d.secondary?.emailType||''}${d.secondary?.emailType?' — ':''}${d.secondary?.email||''}`],['Phone',`${d.secondary?.phoneType||''}${d.secondary?.phoneType?' — ':''}${d.secondary?.phone||''}`],['Physical Address',address(d.secondary?.physical)]]},
-      {title:'Employment Information',rows:[['Employment Status',d.secondary?.employment?.status],['Employer / Business',d.secondary?.employment?.employer],['Job Title',d.secondary?.employment?.jobTitle],['Industry',d.secondary?.employment?.industry],['Status Date',formatDate(d.secondary?.employment?.statusDate)],['Employer Address',address(d.secondary?.employment?.address)]]},
-      {title:'Financial Information',rows:[['Income Range',d.secondary?.financial?.incomeRange],['Net Worth',d.secondary?.financial?.netWorth],['Liquid Net Worth',d.secondary?.financial?.liquidNetWorth],['Source of Wealth',(d.secondary?.financial?.sourceOfWealth||[]).join(', ')]]}
+      {title:'Employment Information',rows:[['Employment Status',d.secondary?.employment?.status],['Employer / Business',d.secondary?.employment?.employer],['Job Title',d.secondary?.employment?.jobTitle],['Industry',d.secondary?.employment?.industry],['Status Date',formatDate(d.secondary?.employment?.statusDate)],['Employer Address',empAddress(d.secondary?.employment)]]},
+      {title:'Financial Information',rows:[['Income Range',d.secondary?.financial?.incomeRange],['Net Worth',d.secondary?.financial?.netWorth],['Liquid Net Worth',d.secondary?.financial?.liquidNetWorth],['Source of Wealth',wealthText(d.secondary?.financial)]]}
     ],right:[{title:'Secondary Beneficiaries',rows:(d.beneficiaries?.secondary||[]).map((x,i)=>[`Beneficiary ${i+1}`,`${x.name||'—'} | ${x.relationship||'—'} | ${x.type||'—'} | ${x.percentage||'—'}%`])}]});}
     const pages=[],rgb=(r,g,b)=>`${r} ${g} ${b} rg`,stroke=(r,g,b)=>`${r} ${g} ${b} RG`;
     for(const spec of pageSpec){
@@ -1465,7 +1478,7 @@
       drawColumn(spec.left,36,264);drawColumn(spec.right,312,264);
       ops.push(`${stroke(.78,.81,.85)} .5 w 36 30 m 576 30 l S`);text(36,17,6.5,'Confidential - Client Information Sheet');text(523,17,6.5,`Page ${pages.length+1} of ${pageSpec.length}`);pages.push(ops.join('\n'));
     }
-    const objects=[];objects[1]='<< /Type /Catalog /Pages 2 0 R >>';const kids=[];let obj=3;pages.forEach(()=>{kids.push(`${obj} 0 R`);obj+=2});objects[2]=`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;const font1=3+pages.length*2,font2=font1+1;obj=3;pages.forEach(stream=>{const contentObj=obj+1;objects[obj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentObj} 0 R >>`;objects[contentObj]=`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;obj+=2});objects[font1]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';objects[font2]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';let pdf='%PDF-1.4\n',offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=pdf.length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return new Blob([pdf],{type:'application/pdf'});
+    const objects=[];objects[1]='<< /Type /Catalog /Pages 2 0 R >>';const kids=[];let obj=3;pages.forEach(()=>{kids.push(`${obj} 0 R`);obj+=2});objects[2]=`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;const font1=3+pages.length*2,font2=font1+1;obj=3;pages.forEach(stream=>{const contentObj=obj+1;objects[obj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentObj} 0 R >>`;objects[contentObj]=`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;obj+=2});objects[font1]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';objects[font2]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';let pdf='%PDF-1.4\n',offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=pdf.length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return new Blob([pdf],{type:'application/pdf'});
   }
   function blobToBase64(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob)})}
   async function createAttachedEmail(email,blob,filename){
@@ -1541,7 +1554,25 @@
   $('mailingToggle').addEventListener('change',()=>{toggleMailing();scheduleSave()});$('secondaryToggle').addEventListener('change',()=>{toggleSecondary();scheduleSave()});['primary.maritalStatus','primary.physical.street','primary.physical.city','primary.physical.state','primary.physical.zip','primary.firstName','primary.middleName','primary.lastName','secondary.firstName','secondary.middleName','secondary.lastName'].forEach(n=>form.querySelector(`[name="${n}"]`)?.addEventListener('input',()=>{syncMarriedSecondary();syncSpouseBeneficiaries()}));
   document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addRepeat(b.dataset.add);scheduleSave()});
   $('prevBtn').onclick=()=>showStep(current===4&&!$('secondaryToggle').checked?2:current-1);$('nextBtn').onclick=()=>{if(current===steps.length-1){showStep(0);return}if(validateCurrent())showStep(current===2&&!$('secondaryToggle').checked?4:current+1)};
-  $('printBtn')?.addEventListener('click',()=>{renderReview();window.print()});
+  $('printBtn')?.addEventListener('click',async()=>{
+    renderReview();
+    let blob,filename;
+    try{blob=makePdfBlob();filename=fileBase()+'_Client_Information.pdf'}catch(err){console.error('PDF build failed:',err);window.print();return}
+    const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    if(isiOS&&navigator.share){
+      const file=new File([blob],filename,{type:'application/pdf'});
+      if(!navigator.canShare||navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:filename});return}
+        catch(err){if(err?.name==='AbortError')return;console.warn('Share failed, downloading instead.',err)}
+      }
+      downloadBlob(filename,blob);return;
+    }
+    // Desktop / Android: open the PDF in a new tab (print or download from there); fall back to a download if pop-ups are blocked.
+    const url=URL.createObjectURL(blob);
+    const win=window.open(url,'_blank');
+    if(!win){downloadBlob(filename,blob)}
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  });
   $('emailBtn')?.addEventListener('click',async()=>{
     const advisor=$('advisorEmail');
     const email=advisor?.value?.trim()||'';
