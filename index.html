@@ -944,6 +944,10 @@
   .app{min-height:0!important;padding:0!important}
   .validation,.bottom-nav,#savedDraftBanner{display:none!important}
 }
+  .action-grid-single{grid-template-columns:1fr!important;max-width:520px}
+  /* Keyboard: always show where focus is */
+  .choice-btn:focus-visible,.check:focus-within,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2f6fa5!important;outline-offset:2px!important}
+  .switch input:focus-visible+.slider{outline:3px solid #2f6fa5;outline-offset:2px}
 </style>
 
 </head>
@@ -1108,18 +1112,17 @@
       </section>
 
       <section class="step" id="step-review" data-step="8">
-        <div class="step-head"><div><h2>Review & finish</h2><p>Confirm the information, then print, save as PDF, or prepare an email.</p></div><span class="step-num">Step 9 of 9</span></div>
+        <div class="step-head"><div><h2>Review & finish</h2><p>Confirm the information, then print or save as PDF.</p></div><span class="step-num">Step 9 of 9</span></div>
         <div class="card"><div id="reviewContent"></div></div>
 
         <div class="finish-banner no-print" id="finishBanner">
           <div class="finish-check">✓</div>
           <h2>You're all set!</h2>
-          <p>Your Client Information Sheet is complete. Review anything you'd like to change, then save or send it below.</p>
+          <p>Your Client Information Sheet is complete. Review anything you'd like to change, then print it below.</p>
         </div>
 
-        <div class="card no-print"><h3>Save or send</h3><div class="action-grid">
+        <div class="card no-print"><h3>Print</h3><div class="action-grid action-grid-single">
           <div class="action-card"><h4>Print or save as PDF</h4><p>Creates the Client Profile Sheet as a PDF. Print it or save it from there. On iPhone and iPad, choose Print or Save to Files from the Share Sheet.</p><button type="button" class="btn btn-primary" id="printBtn">Print / Save PDF</button></div>
-          <div class="action-card"><h4>Email completed form</h4><p>Select the advisor, then send the completed Client Profile Sheet as a PDF. On iPhone and iPad, your device's Share Sheet opens so you can choose Mail or Outlook.</p><div style="margin-bottom:10px"><label class="req" for="advisorEmail">Financial advisor</label><select id="advisorEmail" required><option value="">Select an advisor</option><option value="braxton.oliver@raymondjames.com" selected>Braxton Oliver — braxton.oliver@raymondjames.com</option><option value="taylor.grant@raymondjames.com">Taylor Grant — taylor.grant@raymondjames.com</option><option value="kim.vestal@raymondjames.com">Kim Vestal — kim.vestal@raymondjames.com</option><option value="sid.grant@raymondjames.com">Sid Grant — sid.grant@raymondjames.com</option><option value="erik.presley@raymondjames.com">Erik Presley — erik.presley@raymondjames.com</option><option value="jeremiah.presley@raymondjames.com">Jeremiah Presley — jeremiah.presley@raymondjames.com</option></select></div><button type="button" class="btn btn-primary" id="emailBtn">Email Client Profile Sheet</button><p id="iosAdvisorHint" class="small hidden" style="margin-top:9px;color:var(--muted)">Selected advisor: <strong id="iosAdvisorHintText"></strong>. iPad/iPhone will attach the PDF through the Share Sheet; iOS controls the To field.</p></div>
           
           
         </div></div>
@@ -1317,7 +1320,7 @@
     document.querySelectorAll('[data-check-group]').forEach(group=>pathSet(data,group.dataset.checkGroup,[...group.querySelectorAll('input:checked')].map(x=>x.value)));
     ['primary','secondary'].forEach(owner=>document.querySelectorAll(`#${owner}Beneficiaries .repeat-item`).forEach(item=>{const o={};item.querySelectorAll('[data-field]').forEach(el=>o[el.dataset.field]=el.value);if(Object.values(o).some(x=>String(x||'').trim()))data.beneficiaries[owner].push(o)}));
     document.querySelectorAll('#children .repeat-item').forEach(item=>{const o={};item.querySelectorAll('[data-field]').forEach(el=>o[el.dataset.field]=el.value);data.children.push(o)});
-    data.settings={advisorEmail:$('advisorEmail').value};
+    data.settings={advisorEmail:$('advisorEmail')?.value||''};
     return data;
   }
   function save(){ try{if(!archivedExistingDraft){const existing=localStorage.getItem(STORAGE_KEY);if(existing)localStorage.setItem(PREVIOUS_KEY,existing);archivedExistingDraft=true}localStorage.setItem(STORAGE_KEY,JSON.stringify(serialize()));setSaveState('Saved locally')}catch(e){setSaveState('Could not save','error')} }
@@ -1336,12 +1339,12 @@
     $('mailingToggle').checked=!!data.meta?.hasMailing; toggleMailing(); $('secondaryToggle').checked=!!data.meta?.hasSecondary; toggleSecondary();
     ['primary','secondary'].forEach(owner=>{$(owner+'Beneficiaries').innerHTML='';const list=Array.isArray(data.beneficiaries)?(owner==='primary'?data.beneficiaries:[]):(data.beneficiaries?.[owner]||[]);list.forEach(x=>addRepeat('beneficiary',x,owner));if(!list.length)addRepeat('beneficiary',{},owner)})
     $('children').innerHTML='';(data.children||[]).forEach(x=>addRepeat('child',x));if(!(data.children||[]).length)addRepeat('child')
-    $('advisorEmail').value=data.settings?.advisorEmail||''; updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();syncMarriedSecondary();syncSpouseBeneficiaries();beneficiaryTotals('primary');beneficiaryTotals('secondary');setSaveState('Saved draft restored');
+    if($('advisorEmail'))$('advisorEmail').value=data.settings?.advisorEmail||''; updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();syncMarriedSecondary();syncSpouseBeneficiaries();beneficiaryTotals('primary');beneficiaryTotals('secondary');setSaveState('Saved draft restored');
   }
   function resetBlank(){
     form.reset();$('primaryBeneficiaries').innerHTML='';$('secondaryBeneficiaries').innerHTML='';$('children').innerHTML='';
     addRepeat('beneficiary',{},'primary');addRepeat('beneficiary',{},'secondary');addRepeat('child');
-    $('advisorEmail').value='';toggleMailing();toggleSecondary();updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();showStep(0);setSaveState('Blank profile');
+    if($('advisorEmail'))$('advisorEmail').value='';toggleMailing();toggleSecondary();updateEmployment('primary');updateEmployment('secondary');updatePreferred('primary');updatePreferred('secondary');updateTrusted();showStep(0);setSaveState('Blank profile');
   }
   function showSavedDraftOption(){
     const raw=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(PREVIOUS_KEY);if(!raw)return;
@@ -1473,77 +1476,12 @@
       const box=(x,y,w,h)=>ops.push(`${stroke(.84,.87,.90)} .45 w ${x} ${y} ${w} ${h} re S`);
       const wrap=(value,max=34)=>{const raw=clean(value)||'Not provided',words=raw.split(/\s+/),out=[];let cur='';for(const w of words){const n=(cur+' '+w).trim();if(n.length>max&&cur){out.push(cur);cur=w}else cur=n}if(cur)out.push(cur);return out.slice(0,3)};
       fill(0,744,612,48,[.09,.18,.30]);text(36,765,15,'CLIENT INFORMATION SHEET',true,[1,1,1]);text(36,750,7.5,'CONFIDENTIAL - FOR ADVISOR USE',false,[.86,.90,.95]);
-      fill(36,701,540,32,[.95,.97,.985]);box(36,701,540,32);text(45,718,11,spec.name,true,[.08,.16,.25]);text(430,718,7,'PREPARED',true,[.34,.39,.46]);text(474,718,7.5,prepared);text(430,706,7,'ADVISOR',true,[.34,.39,.46]);text(474,706,7.5,advisor);
+      fill(36,701,540,32,[.95,.97,.985]);box(36,701,540,32);text(45,712,11,spec.name,true,[.08,.16,.25]);text(430,712,7,'PREPARED',true,[.34,.39,.46]);text(474,712,7.5,prepared);
       const drawColumn=(sections,x,w)=>{const active=sections.map(s=>({title:s.title,rows:s.rows.filter(r=>clean(r[1]))})).filter(s=>s.rows.length);const totalRows=active.reduce((n,s)=>n+s.rows.length,0),rowH=Math.max(14,Math.min(19,(638-active.length*25)/Math.max(totalRows,1)));let y=688;for(const sec of active){fill(x,y-20,w,20,[.89,.93,.97]);fill(x,y-20,4,20,[.13,.37,.62]);text(x+10,y-14,8.5,sec.title.toUpperCase(),true,[.08,.22,.38]);y-=24;for(const [label,val] of sec.rows){const lines=wrap(val,34),h=Math.max(rowH,lines.length*8+5);fill(x,y-h,w,h,[.988,.99,.993]);box(x,y-h,w,h);text(x+7,y-10,6.5,label.toUpperCase(),true,[.36,.40,.46]);lines.forEach((ln,i)=>text(x+94,y-10-i*8,7.8,ln,false,[.08,.10,.14]));y-=h+2;}y-=5;}};
       drawColumn(spec.left,36,264);drawColumn(spec.right,312,264);
       ops.push(`${stroke(.78,.81,.85)} .5 w 36 30 m 576 30 l S`);text(36,17,6.5,'Confidential - Client Information Sheet');text(523,17,6.5,`Page ${pages.length+1} of ${pageSpec.length}`);pages.push(ops.join('\n'));
     }
     const objects=[];objects[1]='<< /Type /Catalog /Pages 2 0 R >>';const kids=[];let obj=3;pages.forEach(()=>{kids.push(`${obj} 0 R`);obj+=2});objects[2]=`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;const font1=3+pages.length*2,font2=font1+1;obj=3;pages.forEach(stream=>{const contentObj=obj+1;objects[obj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentObj} 0 R >>`;objects[contentObj]=`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;obj+=2});objects[font1]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';objects[font2]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';let pdf='%PDF-1.4\n',offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=pdf.length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return new Blob([pdf],{type:'application/pdf'});
-  }
-  function blobToBase64(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob)})}
-  async function createAttachedEmail(email,blob,filename){
-    const advisorSelect=$('advisorEmail');
-    const advisorName=advisorSelect?.selectedIndex>0
-      ? advisorSelect.options[advisorSelect.selectedIndex].text.split(' — ')[0].trim()
-      : 'Advisor';
-    const d=serialize(),client=[d.primary?.firstName,d.primary?.lastName].filter(Boolean).join(' ')||'Client';
-    const clientLast=(d.primary?.lastName||'Client').trim()||'Client';
-    const subject=`${clientLast} Profile Sheet`;
-    const body=`Hi ${advisorName}, please see my attached client profile sheet`;
-
-    // iPhone / iPad: use the native Share Sheet so the generated PDF is
-    // handed directly to Mail, Outlook, or another installed mail app.
-    // iOS controls the recipient field when sharing a file, so the selected
-    // advisor address is shown in the app as a reference but cannot be forced
-    // into the To field through Safari's Web Share API.
-    const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)
-      || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-
-    if(isiOS && navigator.share){
-      const file=new File([blob],filename,{type:'application/pdf'});
-      const shareData={title:subject,text:body,files:[file]};
-
-      if(!navigator.canShare || navigator.canShare({files:[file]})){
-        try{
-          await navigator.share(shareData);
-          return;
-        }catch(err){
-          if(err?.name==='AbortError') return;
-          console.warn('Native share failed, falling back to PDF download.',err);
-        }
-      }
-
-      // Fallback if this browser cannot share files directly.
-      downloadBlob(filename,blob);
-      alert(`The PDF was downloaded. Send it to ${advisorName} at ${email}.`);
-      return;
-    }
-
-    // Desktop: create a standards-based .eml with To, body, and PDF attachment.
-    const b64=await blobToBase64(blob),boundary='----ClientProfileBoundary'+Date.now();
-    const eml=[
-      `To: ${email}`,
-      `Subject: ${subject}`,
-      'MIME-Version: 1.0',
-      `Content-Type: multipart/mixed; boundary="${boundary}"`,
-      '',
-      `--${boundary}`,
-      'Content-Type: text/plain; charset="UTF-8"',
-      'Content-Transfer-Encoding: 8bit',
-      '',
-      body,
-      '',
-      `--${boundary}`,
-      `Content-Type: application/pdf; name="${filename}"`,
-      'Content-Transfer-Encoding: base64',
-      `Content-Disposition: attachment; filename="${filename}"`,
-      '',
-      b64.match(/.{1,76}/g).join('\r\n'),
-      '',
-      `--${boundary}--`
-    ].join('\r\n');
-
-    downloadBlob(fileBase()+'_Client_Profile_Email.eml',new Blob([eml],{type:'message/rfc822'}));
   }
   function downloadBlob(filename,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
   function download(filename,text,type='application/json'){const blob=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
@@ -1584,19 +1522,6 @@
     const win=window.open(url,'_blank');
     if(!win)showPdfReady(blob,filename,'Your browser blocked the new tab — tap below to open it.');
     setTimeout(()=>URL.revokeObjectURL(url),60000);
-  });
-  $('emailBtn')?.addEventListener('click',async()=>{
-    const advisor=$('advisorEmail');
-    const email=advisor?.value?.trim()||'';
-    if(!email){advisor?.focus();alert('Select a financial advisor first.');return}
-    try{
-      const blob=makePdfBlob();
-      const filename=fileBase()+'_Client_Information.pdf';
-      await createAttachedEmail(email,blob,filename);
-    }catch(err){
-      console.error('Email creation failed:',err);
-      alert('The email could not be created. Please try again.');
-    }
   });
   $('resumeSavedBtn').onclick=loadSavedDraft;
   $('dismissSavedBtn').onclick=()=>$('savedDraftBanner').classList.add('hidden');
@@ -1926,26 +1851,40 @@
 
 
 
-<script id="iosEmailShareHintV17">
-(() => {
-  const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)
-    || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-  const select=document.getElementById('advisorEmail');
-  const hint=document.getElementById('iosAdvisorHint');
-  const hintText=document.getElementById('iosAdvisorHintText');
-  if(!isiOS || !select || !hint || !hintText) return;
 
-  function sync(){
-    if(select.selectedIndex>0){
-      const option=select.options[select.selectedIndex];
-      hintText.textContent=option.text;
-      hint.classList.remove('hidden');
-    }else{
-      hint.classList.add('hidden');
-    }
+
+
+<script id="keyboardTabFixV22">
+(() => {
+  // The original dropdowns behind the big choice buttons are invisible; keep them out of Tab / iPad next-field order.
+  document.querySelectorAll('select.select-proxy-original').forEach(sel=>{sel.tabIndex=-1;sel.setAttribute('aria-hidden','true')});
+  // Choice buttons behave like a radio group: one Tab stop, arrow keys move and select, Enter/Space selects.
+  // Re-highlight the big choice buttons from the saved values (restoring a saved sheet sets values without updating them).
+  function resyncChoices(){
+    document.querySelectorAll('select.select-proxy-original').forEach(sel=>{
+      const proxy=sel.parentElement?.querySelector('.choice-proxy');if(!proxy)return;
+      proxy.querySelectorAll('.choice-btn').forEach(b=>b.classList.toggle('selected',(b.querySelector('span')?.textContent||'').trim()===sel.value));
+    });
   }
-  select.addEventListener('change',sync);
-  sync();
+  ['resumeSavedBtn','clearBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>setTimeout(resyncChoices,0)));
+  document.querySelectorAll('.step').forEach(st=>new MutationObserver(()=>{if(st.classList.contains('active'))resyncChoices()}).observe(st,{attributes:true,attributeFilter:['class']}));
+  resyncChoices();
+  document.querySelectorAll('.choice-proxy .choice-grid').forEach(grid=>{
+    const btns=[...grid.querySelectorAll('.choice-btn')];
+    grid.setAttribute('role','radiogroup');
+    const syncStops=()=>{const sel=btns.findIndex(b=>b.classList.contains('selected'));btns.forEach((b,i)=>{b.setAttribute('role','radio');b.setAttribute('aria-checked',String(i===sel));b.tabIndex=(sel<0?i===0:i===sel)?0:-1})};
+    btns.forEach((b,i)=>{
+      b.addEventListener('click',()=>setTimeout(syncStops,0));
+      b.addEventListener('keydown',e=>{
+        const step={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];
+        if(!step)return;
+        e.preventDefault();
+        const next=btns[(i+step+btns.length)%btns.length];next.focus();next.click();
+      });
+    });
+    new MutationObserver(syncStops).observe(grid,{subtree:true,attributes:true,attributeFilter:['class']});
+    syncStops();
+  });
 })();
 </script>
 
