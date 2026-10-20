@@ -1894,5 +1894,24 @@
 })();
 </script>
 
+
+<script id="returnGoesNextV23">
+(() => {
+  // iPad/iPhone keyboards usually have no Tab key: make Return ("next") jump to the next typing field on the current page.
+  const TYPED='input:not([type]),input[type="text"],input[type="email"],input[type="tel"],input[type="number"],input[type="search"],input[type="url"],textarea';
+  const fields=()=>{const step=document.querySelector('.step.active');if(!step)return[];
+    return [...step.querySelectorAll(TYPED)].filter(el=>!el.disabled&&!el.readOnly&&el.tabIndex!==-1&&el.offsetParent!==null&&getComputedStyle(el).visibility!=='hidden')};
+  document.addEventListener('focusin',e=>{const el=e.target;if(!el?.matches?.(TYPED)||el.tagName==='TEXTAREA')return;
+    const list=fields();el.setAttribute('enterkeyhint',list.indexOf(el)===list.length-1?'done':'next')},true);
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'||e.isComposing||e.shiftKey||e.altKey||e.ctrlKey||e.metaKey)return;
+    const el=e.target;if(!el?.matches?.(TYPED)||el.tagName==='TEXTAREA')return;
+    e.preventDefault();
+    const list=fields(),i=list.indexOf(el);
+    if(i>=0&&i<list.length-1){list[i+1].focus();list[i+1].select?.()}else el.blur();
+  },true);
+})();
+</script>
+
 </body>
 </html>
