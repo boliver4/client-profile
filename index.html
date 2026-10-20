@@ -1903,6 +1903,20 @@
     return [...step.querySelectorAll(TYPED)].filter(el=>!el.disabled&&!el.readOnly&&el.tabIndex!==-1&&el.offsetParent!==null&&getComputedStyle(el).visibility!=='hidden')};
   document.addEventListener('focusin',e=>{const el=e.target;if(!el?.matches?.(TYPED)||el.tagName==='TEXTAREA')return;
     const list=fields();el.setAttribute('enterkeyhint',list.indexOf(el)===list.length-1?'done':'next')},true);
+  // iPad Safari with a Bluetooth keyboard doesn't move between fields on Tab, so do it ourselves there (computers keep native Tab).
+  const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(isiOS)document.addEventListener('keydown',e=>{
+    if(e.key!=='Tab'||e.altKey||e.ctrlKey||e.metaKey)return;
+    const el=e.target,list=fields(),i=list.indexOf(el);
+    if(i<0){ // from a dropdown/button/checkbox: jump to the next or previous typing field after it
+      if(!el?.closest?.('.step.active'))return;
+      const after=list.filter(f=>el.compareDocumentPosition(f)&(e.shiftKey?Node.DOCUMENT_POSITION_PRECEDING:Node.DOCUMENT_POSITION_FOLLOWING));
+      const t=e.shiftKey?after.at(-1):after[0];if(!t)return;e.preventDefault();t.focus();t.select?.();return;
+    }
+    e.preventDefault();
+    const t=e.shiftKey?list[i-1]:list[i+1];
+    if(t){t.focus();t.select?.()}else if(!e.shiftKey){document.getElementById('nextBtn')?.focus()}
+  },true);
   document.addEventListener('keydown',e=>{
     if(e.key!=='Enter'||e.isComposing||e.shiftKey||e.altKey||e.ctrlKey||e.metaKey)return;
     const el=e.target;if(!el?.matches?.(TYPED)||el.tagName==='TEXTAREA')return;
