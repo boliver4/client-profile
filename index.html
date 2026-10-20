@@ -1554,23 +1554,35 @@
   $('mailingToggle').addEventListener('change',()=>{toggleMailing();scheduleSave()});$('secondaryToggle').addEventListener('change',()=>{toggleSecondary();scheduleSave()});['primary.maritalStatus','primary.physical.street','primary.physical.city','primary.physical.state','primary.physical.zip','primary.firstName','primary.middleName','primary.lastName','secondary.firstName','secondary.middleName','secondary.lastName'].forEach(n=>form.querySelector(`[name="${n}"]`)?.addEventListener('input',()=>{syncMarriedSecondary();syncSpouseBeneficiaries()}));
   document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addRepeat(b.dataset.add);scheduleSave()});
   $('prevBtn').onclick=()=>showStep(current===4&&!$('secondaryToggle').checked?2:current-1);$('nextBtn').onclick=()=>{if(current===steps.length-1){showStep(0);return}if(validateCurrent())showStep(current===2&&!$('secondaryToggle').checked?4:current+1)};
+  function showPdfReady(blob,filename,note){
+    const btn=$('printBtn');if(!btn)return;
+    let box=$('pdfReadyBox');
+    if(!box){box=document.createElement('div');box.id='pdfReadyBox';box.className='no-print';box.style.cssText='margin-top:12px;padding:12px;border:1px solid #b9d3ea;border-radius:10px;background:#f2f8fd;font-size:.92rem;line-height:1.35';btn.insertAdjacentElement('afterend',box)}
+    if(box.dataset.url)URL.revokeObjectURL(box.dataset.url);
+    const url=URL.createObjectURL(blob);box.dataset.url=url;
+    box.innerHTML=`<strong>Your PDF is ready.</strong> ${esc(note||'')}<div style="margin-top:8px"><a class="btn btn-primary" style="display:inline-block;text-decoration:none" href="${url}" target="_blank" rel="noopener">Open PDF</a></div><div style="margin-top:6px;color:#4a5868;font-size:.82rem">${esc(filename)} — then tap Share › Print, or Save to Files.</div>`;
+  }
   $('printBtn')?.addEventListener('click',async()=>{
     renderReview();
     let blob,filename;
-    try{blob=makePdfBlob();filename=fileBase()+'_Client_Information.pdf'}catch(err){console.error('PDF build failed:',err);window.print();return}
+    try{blob=makePdfBlob();filename=fileBase()+'_Client_Information.pdf'}
+    catch(err){console.error('PDF build failed:',err);alert('The PDF could not be created. Please try again.');return}
     const isiOS=/iPad|iPhone|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-    if(isiOS&&navigator.share){
-      const file=new File([blob],filename,{type:'application/pdf'});
-      if(!navigator.canShare||navigator.canShare({files:[file]})){
-        try{await navigator.share({files:[file],title:filename});return}
-        catch(err){if(err?.name==='AbortError')return;console.warn('Share failed, downloading instead.',err)}
+    if(isiOS){
+      // Always give a tappable link too, so the button never appears to do nothing.
+      showPdfReady(blob,filename,'If the Share Sheet did not open, tap below.');
+      if(navigator.share){
+        try{
+          const file=new File([blob],filename,{type:'application/pdf'});
+          if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file]});}
+        }catch(err){if(err?.name!=='AbortError')console.warn('Share failed; use the Open PDF link.',err)}
       }
-      downloadBlob(filename,blob);return;
+      return;
     }
-    // Desktop / Android: open the PDF in a new tab (print or download from there); fall back to a download if pop-ups are blocked.
+    // Desktop / Android: open the PDF in a new tab (print or download from there).
     const url=URL.createObjectURL(blob);
     const win=window.open(url,'_blank');
-    if(!win){downloadBlob(filename,blob)}
+    if(!win)showPdfReady(blob,filename,'Your browser blocked the new tab — tap below to open it.');
     setTimeout(()=>URL.revokeObjectURL(url),60000);
   });
   $('emailBtn')?.addEventListener('click',async()=>{
